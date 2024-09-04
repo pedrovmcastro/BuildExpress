@@ -1,5 +1,11 @@
 -- SCRIPT PARA INSERÇÃO DE DADOS
 
+-- Database BuildExrpress
+
+-- Alunos:
+-- Pedro Henrique Cezarini
+-- Pedro Vitor Marques de Castro
+
 \! echo 'enderecos';
 -- Inserção de 7 endereços:
 INSERT INTO `enderecos` (`logradouro`, `numero`, `bairro`, `cidade`, `cep`) VALUES

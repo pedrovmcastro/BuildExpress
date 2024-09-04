@@ -1,3 +1,9 @@
+-- Database BuildExrpress
+
+-- Alunos:
+-- Pedro Henrique Cezarini
+-- Pedro Vitor Marques de Castro
+
 -- Tables
 
 CREATE TABLE `enderecos` (
