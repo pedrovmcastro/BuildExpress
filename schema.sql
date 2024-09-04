@@ -9,14 +9,6 @@ CREATE TABLE `enderecos` (
     `cep` VARCHAR(10) NOT NULL
 );
 
-CREATE TABLE `enderecos_usuarios` (
-    `id_usuario` INT,
-    `id_endereco` INT,
-    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`),
-    FOREIGN KEY (`id_endereco`) REFERENCES `enderecos`(`id`),
-    PRIMARY KEY(`id_usuario`, `id_endereco`)
-);
-
 CREATE TABLE `usuarios` (
     `id` INT AUTO_INCREMENT PRIMARY KEY, 
     `nome` VARCHAR(100) NOT NULL,
@@ -25,13 +17,32 @@ CREATE TABLE `usuarios` (
     `email` VARCHAR(30) NOT NULL
 );
 
+CREATE TABLE `enderecos_usuarios` (
+    `id_usuario` INT,
+    `id_endereco` INT,
+    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`),
+    FOREIGN KEY (`id_endereco`) REFERENCES `enderecos`(`id`),
+    PRIMARY KEY(`id_usuario`, `id_endereco`)
+);
+
 CREATE TABLE `veiculos` (
     `id` INT AUTO_INCREMENT PRIMARY KEY, 
     `categoria` VARCHAR(20) NOT NULL, 
     `placa` VARCHAR(7) NOT NULL,
     `marca` VARCHAR(20) NOT NULL,
     `modelo` VARCHAR(20) NOT NULL,
-    `imagem` VARCHAR(255) NOT NULL,
+    `imagem` VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE `motoristas` (
+    `id_usuario` INT PRIMARY KEY,
+    `cnh` VARCHAR(9) NOT NULL,
+    `categoria` ENUM('A', 'B', 'C', 'D', 'E') NOT NULL,
+    `nota` FLOAT NOT NULL,
+    `qtd_viagens` INT NOT NULL,
+    `foto` VARCHAR(255) NOT NULL,
+    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`),
+    CHECK (`nota` >= 0 AND `nota` <= 5)
 );
 
 CREATE TABLE `veiculos_motoristas` (
@@ -42,25 +53,16 @@ CREATE TABLE `veiculos_motoristas` (
     PRIMARY KEY(`id_veiculo`, `id_motorista`)
 );
 
-CREATE TABLE `motoristas` (
-    `id_usuario` INT PRIMARY KEY,
-    `cnh` VARCHAR(9) NOT NULL,
-    `categoria` VARCHAR(1) NOT NULL CHECK (`categoria` IN ('A', 'B', 'C', 'D', 'E')),
-    `nota` FLOAT NOT NULL CHECK (`nota` >= 0 AND `nota` <= 5),
-    `qtd_viagens` INT NOT NULL,
-    `foto` VARCHAR(255) NOT NULL,
-    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`)
-);
-
 CREATE TABLE `lojas` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_endereco` INT NOT NULL,
     `nome` VARCHAR(100) NOT NULL,
     `cnpj` VARCHAR(14) NOT NULL UNIQUE,
     `ie` VARCHAR(9) NOT NULL UNIQUE,
-    `nota` FLOAT NOT NULL CHECK (`nota` >= 0 AND `nota` <= 5),
+    `nota` FLOAT NOT NULL,
     `logo` VARCHAR(255) NOT NULL,
-    FOREIGN KEY (`id_endereco`) REFERENCES `enderecos`(`id`)
+    FOREIGN KEY (`id_endereco`) REFERENCES `enderecos`(`id`),
+    CHECK (`nota` >= 0 AND `nota` <= 5)
 );
 
 CREATE TABLE `produtos` (
@@ -74,6 +76,15 @@ CREATE TABLE `produtos` (
     FOREIGN KEY(`id_loja`) REFERENCES `lojas`(`id`) 
 );
 
+CREATE TABLE `carrinhos` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_usuario` INT NOT NULL,
+    `qtd_itens` INT NOT NULL,
+    `preco_total` INT NOT NULL,
+    `peso_total` FLOAT NOT NULL,
+    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`)
+);
+
 CREATE TABLE `itens_carrinho` (
     `id_carrinho` INT, 
     `id_produto` INT,
@@ -82,24 +93,15 @@ CREATE TABLE `itens_carrinho` (
     PRIMARY KEY(`id_carrinho`, `id_produto`) 
 );
 
-CREATE TABLE `carrinho` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `id_usuario` INT NOT NULL,
-    `qtd_itens` INT NOT NULL,
-    `preco_total` INT NOT NULL,
-    `peso_total` FLOAT NOT NULL,
-    FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`),
-);
-
 CREATE TABLE `pedidos` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_carrinho` INT NOT NULL,
     `id_endereco_entrega` INT NOT NULL,
     `datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `taxa_entrega` FLOAT NOT NULL,
-    `status_pedido` VARCHAR(20) NOT NULL CHECK (`status` IN ('aguardando', 'preparando o pedido', 'saiu para entrega')),
+    `status_pedido` ENUM('aguardando', 'preparando o pedido', 'saiu para entrega') NOT NULL,
     FOREIGN KEY (`id_carrinho`) REFERENCES `carrinhos`(`id`),
-    FOREIGN KEY (`id_endereco_entrega`) REFERENCES `enderecos`(`id`);
+    FOREIGN KEY (`id_endereco_entrega`) REFERENCES `enderecos`(`id`)
 );
 
 CREATE TABLE `pagamentos` (
@@ -108,17 +110,27 @@ CREATE TABLE `pagamentos` (
     `metodo_pagamento` VARCHAR(20) NOT NULL,
     `valor` FLOAT NOT NULL,
     `data_pagamento` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`id_pedido`) REFERENCES `pedidos`(`id`),
+    FOREIGN KEY (`id_pedido`) REFERENCES `pedidos`(`id`)
 );
+
+CREATE TABLE `comissoes_aplicativo` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id_pedido` INT NOT NULL,
+    `valor_comissao` FLOAT NOT NULL,
+    `data_comissao` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`id_pedido`) REFERENCES `pedidos`(`id`)
+);
+
+\! echo 'entregas';
 
 CREATE TABLE `entregas` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_pedido` INT NOT NULL,
     `id_motorista` INT NOT NULL,
-    `status_entrega` VARCHAR(20) NOT NULL CHECK (`status` IN ('a caminho', 'cancelada', 'entregue')),
+    `status_entrega` ENUM('a caminho', 'cancelada', 'entregue') NOT NULL,
     `codigo_entrega` INT NOT NULL,
     FOREIGN KEY (`id_motorista`) REFERENCES `motoristas`(`id_usuario`),
-    FOREIGN KEY (`id_pedido`) REFERENCES `pedidos`(`id`),
+    FOREIGN KEY (`id_pedido`) REFERENCES `pedidos`(`id`)
 );
 
 CREATE TABLE `pagamentos_motoristas` (
@@ -141,23 +153,25 @@ CREATE TABLE `avaliacoes_lojas` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_usuario` INT NOT NULL,
     `id_loja` INT NOT NULL,
-    `nota` FLOAT NOT NULL CHECK (`nota` >= 0 AND `nota` <= 5),
+    `nota` FLOAT NOT NULL,
     `comentario` VARCHAR(300),
     FOREIGN KEY(`id_loja`) REFERENCES `lojas`(`id`),
-    FOREIGN KEY(`id_usuario`) REFERENCES `usuarios`(`id`)
+    FOREIGN KEY(`id_usuario`) REFERENCES `usuarios`(`id`),
+    CHECK (`nota` >= 0 AND `nota` <= 5)
 );
 
 CREATE TABLE `respostas_avaliacao_loja` (
     `id_avaliacao` INT PRIMARY KEY,
     `resposta` VARCHAR(300),
-    FOREIGN KEY(`id_avaliacao`) REFERENCES `avaliacoes_loja`(`id`),
+    FOREIGN KEY(`id_avaliacao`) REFERENCES `avaliacoes_lojas`(`id`)
 );
 
 CREATE TABLE `avaliacoes_motorista` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `id_motorista` INT NOT NULL,
-    `nota` FLOAT NOT NULL CHECK (`nota` >= 0 AND `nota` <= 5),
+    `nota` FLOAT NOT NULL,
     FOREIGN KEY (`id_motorista`) REFERENCES `motoristas`(`id_usuario`),
+    CHECK (`nota` >= 0 AND `nota` <= 5)
 );
 
 CREATE TABLE `notificacoes` (
