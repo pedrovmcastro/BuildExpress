@@ -1,0 +1,179 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #fb9b57;
+    color: white;
+    padding: 14px 0;
+}
+
+.logo-container {
+    text-align: center; /* Centraliza o logo e o nome */
+    padding: 20px 0; /* Espaçamento ao redor */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centraliza horizontalmente */
+}
+
+.logo img {
+    height: 200px; /* Aumentado para 200% */
+    margin-right: 14px; /* Aumentado */
+}
+
+.top-bar {
+    background-color: #1e1713;
+    padding: 7px 0;
+}
+
+.top-bar ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+.top-bar ul li {
+    margin-right: 28px; /* Aumentado */
+}
+
+.top-bar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.12em; /* Aumentado */
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centraliza o menu */
+    padding: 0 28px; /* Aumentado */
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center; /* Centraliza verticalmente */
+}
+
+nav ul li {
+    margin-right: 28px; /* Aumentado */
+}
+
+nav ul li a {
+    color: #1e1713;
+    text-decoration: none;
+    font-size: 1.68em; /* Aumentado */
+}
+
+.cart-icon {
+    height: 24px; /* Tamanho do ícone do carrinho */
+}
+
+.search-bar {
+    padding: 28px; /* Aumentado */
+    text-align: center;
+}
+
+.search-bar input {
+    width: 70%; /* Aumentado */
+    padding: 14px; /* Aumentado */
+    border: 1px solid #ccc;
+    border-radius: 7px; /* Aumentado */
+}
+
+.products {
+    padding: 28px; /* Aumentado */
+    text-align: center;
+}
+
+.product-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.product {
+    border: 1px solid #ccc; /* Bordas para os produtos */
+    border-radius: 7px; /* Cantos arredondados */
+    padding: 20px; /* Espaçamento interno */
+    margin: 10px; /* Espaçamento entre produtos */
+    width: 250px; /* Largura fixa para os produtos */
+    background-color: white; /* Fundo branco */
+}
+
+.product-img {
+    width: 100%; /* Imagem ocupa toda a largura */
+    height: auto; /* Mantém proporção */
+}
+
+.description {
+    max-height: 40px; /* Altura máxima para a descrição */
+    overflow: hidden; /* Oculta texto que ultrapassa */
+    text-overflow: ellipsis; /* Adiciona "..." no final */
+    white-space: nowrap; /* Impede quebra de linha */
+}
+
+.price {
+    font-weight: bold; /* Preço em negrito */
+    margin: 10px 0; /* Margem ao redor do preço */
+}
+
+.stock {
+    margin-bottom: 10px; /* Margem abaixo da quantidade em estoque */
+}
+
+.store-logo {
+    width: auto;
+    height: 60px; /* Tamanho do logo da loja */
+    margin-bottom: 10px; /* Espaçamento abaixo do logo da loja */
+}
+
+.buy-button {
+    background-color: #fb9b57; /* Cor do botão */
+    color: white; /* Cor do texto */
+    border: none; /* Sem borda */
+    padding: 10px; /* Espaçamento interno */
+    border-radius: 5px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor em forma de mão ao passar o mouse */
+}
+
+.buy-button:hover {
+    background-color: #e09c4e; /* Cor ao passar o mouse */
+}
+
+.categories {
+    padding: 28px; /* Aumentado */
+    background-color: #fff;
+}
+
+.categories ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+.categories ul li {
+    margin-right: 21px; /* Aumentado */
+}
+
+.categories ul li a {
+    text-decoration: none;
+    color: #ff6600;
+}
+
+footer {
+    text-align: center;
+    padding: 14px; /* Aumentado */
+    background-color: #1e1713;
+    color: white;
+}
