@@ -10,7 +10,7 @@ body {
 }
 
 header {
-    background-color: #fb9b57;
+    background-color:#ff6242;
     color: white;
     padding: 14px 0;
 }
@@ -27,7 +27,7 @@ header {
 }
 
 .logo img {
-    height: 200px; /* Aumentado para 200% */
+    height: 50px; /* Aumentado para 200% */
     margin-right: 14px; /* Aumentado */
 }
 
