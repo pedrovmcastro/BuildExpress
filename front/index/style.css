@@ -177,3 +177,36 @@ footer {
     background-color: #1e1713;
     color: white;
 }
+
+.cart {
+    max-width: 600px; /* Largura máxima do carrinho */
+    margin: 50px auto; /* Centraliza horizontalmente */
+    padding: 20px; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda do carrinho */
+    border-radius: 8px; /* Cantos arredondados */
+    background-color: white; /* Fundo branco */
+    text-align: center; /* Centraliza o texto */
+}
+
+.cart-items {
+    display: flex;
+    flex-direction: column; /* Alinha os itens em coluna */
+    align-items: center; /* Centraliza os itens */
+}
+
+.cart-item {
+    display: flex;
+    align-items: center; /* Alinha a imagem e o texto */
+    margin-bottom: 20px; /* Espaçamento entre itens do carrinho */
+    width: 100%; /* Faz o item ocupar toda a largura do carrinho */
+}
+
+.cart-item-img {
+    width: 80px; /* Largura da imagem */
+    height: auto; /* Mantém a proporção */
+    margin-right: 15px; /* Espaço entre a imagem e o texto */
+}
+
+.cart-item-details {
+    text-align: left; /* Alinha o texto à esquerda */
+}
