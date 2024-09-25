@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BuildExpress</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <img src="img/logo.png" alt="BuildExpress Logo">
+            </div>
+        </div>
+    </header>
+
+    <main class="login-container">
+        <h2>Login</h2>
+        <form action="login-process.php" method="POST">
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Entrar</button>
+            <p>Não tem uma conta? <a href="register.html">Cadastre-se aqui</a></p>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 BuildExpress - Site criado por Pedro Vitor Castro e Pedro Cezarini</p>
+    </footer>
+</body>
+</html>
