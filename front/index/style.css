@@ -210,3 +210,13 @@ footer {
 .cart-item-details {
     text-align: left; /* Alinha o texto à esquerda */
 }
+
+.login-container {
+    max-width: 600px; /* Largura máxima do carrinho */
+    margin: 50px auto; /* Centraliza horizontalmente */
+    padding: 20px; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda do carrinho */
+    border-radius: 8px; /* Cantos arredondados */
+    background-color: white; /* Fundo branco */
+    text-align: center; /* Centraliza o texto */
+}
