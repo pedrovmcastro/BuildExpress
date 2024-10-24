@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+.DS_Store
+
+# If you're using MySQL or PostgreSQL, ignore the local database files:
+*.pyo
+*.db
+*.env
+*.local
+
+# Ignore the secret settings file if it exists
+.env
+*.env
+
+# Ignore the local development settings
+settings_local.py
+
+# Ignore the entire virtual environment directory
+venv/
+env/
+ENV/
+*.venv
+
+# Ignore the media files (uploaded by users)
+media/
+staticfiles/
+
+# Ignore node_modules if you're using npm or yarn for frontend management
+node_modules/
+
+# Ignore compiled assets (if you're using something like Webpack)
+static/dist/
+
+# Ignore any coverage files generated during testing
+htmlcov/
+.coverage
+.tox/
+.cache
+coverage.xml
+nosetests.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+test_reports/
+
+# Ignore the compiled translation files
+*.mo
+
+# Ignore editor and IDE-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.iml
