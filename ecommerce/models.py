@@ -49,7 +49,7 @@ class Loja(RenamableImageModel):
     nome = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=14)
     ie = models.CharField(max_length=12)
-    nota = models.DecimalField(max_digits=3, decimal_places=2)
+    nota = models.DecimalField(max_digits=3, decimal_places=2, default=None)
     id_endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
     logo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
@@ -64,6 +64,7 @@ class Produto(RenamableImageModel):
     descricao = models.TextField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     peso = models.DecimalField(max_digits=10, decimal_places=2)
+    nota = models.DecimalField(max_digits=3, decimal_places=2, default=None)
     id_loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
