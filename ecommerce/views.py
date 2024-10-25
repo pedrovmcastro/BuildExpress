@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.db import IntegrityError
 from django.urls import reverse
 
-from .models import Produto, User
+from .models import Produto, User, Loja, Categoria
 
 
 def index(request):
@@ -97,5 +97,36 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "ecommerce/register.html")
-    
-    
+
+
+def categorias(request):
+    return render(request, 'ecommerce/lista_categorias.html', {
+        'categorias': Categoria.objects.all()
+    })
+
+
+def produtos_categoria(request, id_categoria):
+    categoria = get_object_or_404(Categoria, id=id_categoria)
+    produtos = Produto.objects.filter(categoria=categoria)
+
+    return render(request, 'ecommerce/produtos_categoria.html', {
+        'categoria': categoria,
+        'produtos': produtos
+    })
+
+
+def lojas(request):
+    return render(request, 'ecommerce/lista_lojas.html', {
+        'lojas': Loja.objects.all()
+    })
+
+
+def produtos_loja(request, id_loja):
+    loja = get_object_or_404(Loja, id=id_loja)
+    produtos = Produto.objects.filter(loja=loja)
+
+    return render(request, 'ecommerce/produtos_loja.html', {
+        'loja': loja,
+        'produtos': produtos
+    })
+

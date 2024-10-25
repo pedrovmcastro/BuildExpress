@@ -66,6 +66,14 @@ class Loja(RenamableImageModel):
 
     def __str__(self):
         return self.nome
+    
+
+class Categoria(RenamableImageModel):
+    nome = models.CharField(max_length=50)
+    photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
+
+    def __str__(self):
+        return self.nome
 
 
 class Produto(RenamableImageModel):
@@ -74,7 +82,8 @@ class Produto(RenamableImageModel):
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     peso = models.DecimalField(max_digits=10, decimal_places=2)
     nota = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
-    id_loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
+    loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, null=True, blank=True, on_delete=models.SET_NULL)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
     image_field_name = 'photo'

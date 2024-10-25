@@ -1,0 +1,36 @@
+{% extends "ecommerce/layout.html" %}
+
+{% block body %}
+
+    <h2>{{ categoria }}</h2>
+
+    {% if produtos %}
+        <div class="row">
+            {% for produto in produtos %}
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="row no-gutters">
+                            <div class="col-lg-2 col-md-4">
+                                <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="100%" height="200px"> 
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>{{ produto }}</strong></h5>
+                                    <p><strong>R$ {{ produto.preco }}</strong></p>
+                                    <p>{{ produto.descricao }}</p>
+                                    <p>{{ produto.nota }} </p>
+                                    <p>{{ produto.loja.nome }}</p>
+                                    <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="100%" height="50px"> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Esse departamento não possui nenhum produto.</p>
+    {% endif %}
+
+{% endblock body %}
