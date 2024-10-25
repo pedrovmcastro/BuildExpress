@@ -38,6 +38,7 @@ class RenamableImageModel(models.Model):
 class User(AbstractUser):
     nome = models.CharField(max_length=200)
     cpf = models.CharField(max_length=11, unique=True)
+    telefone = models.CharField(max_length=20, default=None, unique=True)
     pass
 
 
