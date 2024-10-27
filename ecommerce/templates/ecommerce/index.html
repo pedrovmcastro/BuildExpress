@@ -1,17 +1,34 @@
 {% extends "ecommerce/layout.html" %}
 
-{% block title %}BuildExpress{% endblock title %}
-
 {% block body %}
     <h2>Produtos</h2>
-    
-    {% for produto in produtos %}
-        <div>
-            <p><strong>{{ produto.nome }}</strong></p>
-            <p>{{ produto.descricao }}</p>
-            <p>{{ produto.preco }}</p>
-            <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="auto" height="200px">
-        </div>
-    {% endfor %}
 
+    <!-- Todos os produtos  -->
+    <div class="row">
+        {% for produto in produtos %}
+            <a href="{% url 'detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="row no-gutters">
+                            <div class="col-lg-2 col-md-4">
+                                <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="100%" height="200px"> 
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>{{ produto }}</strong></h5>
+                                    <p><strong>${{ produto.preco }}</strong></p>
+                                    <p>{{ produto.descricao }}</p>
+                                    <div>
+                                        <p>{{ produto.loja.nome }} <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="80px" height="80px"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    
 {% endblock body %}
