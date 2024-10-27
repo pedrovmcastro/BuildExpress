@@ -1,0 +1,41 @@
+{% extends "ecommerce/layout.html" %}
+
+{% block body %}
+    
+    <h2>{{ produto }}</h2>
+
+    <!--Lógica da Wishlist -->
+    {% if user.is_authenticated %}
+
+        <form method="post" action="{% url 'acionar_wishlist' produto.id %}">
+            {% csrf_token %}
+            {% if in_wishlist %}
+                <input type="submit" value="Remover dos Favoritos" class="btn btn-danger">
+            {% else %}
+                <input type="submit" value="Adicionar aos Favoritos" class="btn btn-primary">
+            {% endif %}
+        </form>
+
+    {% endif %}
+    
+    <!--Detalhes do Produto -->
+    <div>
+        <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="auto" height="400px">
+        <p>{{ produto.descricao }}</p>
+        <h2>R${{ produto.preco }}</h2>
+    </div>
+    
+    <div class="mt-4">
+        <h3 class="mb-4">Detalhes</h3>
+        <div class="card">
+            <div class="card-title">
+                {{ produto.loja.nome }}
+            </div>
+            <div class="card-body">
+                <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="100px" height="100px">
+            </div>
+        </div>
+        <p>Categoria: <a href="{% url 'produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
+    </div>
+
+{% endblock body %}
