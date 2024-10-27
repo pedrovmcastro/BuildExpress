@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 import os
 
@@ -102,11 +103,14 @@ class Wishlist(models.Model):
         return f"{self.user} adicionou {self.produto} a sua lista de desejos."
     
 
-class Comentario(models.Model):
+class Avaliacao(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    content = models.TextField()
+    conteudo = models.TextField()
+    nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     datetime_submited = models.DateTimeField(auto_now_add=True)
+    recomenda = models.BooleanField()
 
     def __str__(self):
-        return f"{self.user} comentou na página do {self.produto} às {self.datetime_submited}"
+        return f"{self.user} avaliou o produto {self.produto} às {self.datetime_submited}"
+    

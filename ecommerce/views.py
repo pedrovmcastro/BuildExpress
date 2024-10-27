@@ -166,3 +166,10 @@ def acionar_wishlist(request, id_produto):
         Wishlist.objects.create(user=request.user, produto=produto)
     
     return redirect('detalhes_produto', id_produto)
+
+"""
+@login_required
+def fazer_avaliacao(request, id_produto):
+    
+
+"""

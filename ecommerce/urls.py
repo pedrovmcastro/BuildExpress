@@ -15,7 +15,8 @@ urlpatterns = [
     path("lojas/<int:id_loja>", views.produtos_loja, name="produtos_loja"),
     path("produto/<int:id_produto>", views.detalhes_produto, name="detalhes_produto"),
     path("wishlist", views.wishlist, name="wishlist"),
-    path("produto/<int:id_produto>/acionar_wishlist", views.acionar_wishlist, name="acionar_wishlist")
+    path("produto/<int:id_produto>/acionar_wishlist", views.acionar_wishlist, name="acionar_wishlist"),
+    #path("produto/<int:id_produto>/avaliacao", views.fazer_avaliacao, name="avaliacao")
 ]
 
 if settings.DEBUG:
