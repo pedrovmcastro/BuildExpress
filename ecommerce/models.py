@@ -37,7 +37,7 @@ class RenamableImageModel(models.Model):
 
 class User(AbstractUser):
     nome = models.CharField(max_length=200)
-    cpf = models.CharField(max_length=11, unique=True)
+    cpf = models.CharField(max_length=15, unique=True)
     telefone = models.CharField(max_length=20, default=None, unique=True)
     pass
 
@@ -48,7 +48,7 @@ class Endereco(models.Model):
     bairro = models.CharField(max_length=100)
     cidade = models.CharField(max_length=50)
     uf = models.CharField(max_length=2, default=None)
-    cep = models.CharField(max_length=10)
+    cep = models.CharField(max_length=15)
     
     def __str__(self):
         return f"{self.logradouro}, {self.numero}, {self.bairro}, {self.cidade} - {self.cep}"
@@ -56,13 +56,23 @@ class Endereco(models.Model):
 
 class Loja(RenamableImageModel):
     nome = models.CharField(max_length=100)
-    cnpj = models.CharField(max_length=14)
-    ie = models.CharField(max_length=12)
+    cnpj = models.CharField(max_length=20)
+    ie = models.CharField(max_length=15)
     nota = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     id_endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
     logo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
     image_field_name = 'logo'
+
+    def __str__(self):
+        return self.nome
+    
+
+class Categoria(RenamableImageModel):
+    nome = models.CharField(max_length=50)
+    photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
+
+    image_field_name = 'photo'
 
     def __str__(self):
         return self.nome
@@ -74,10 +84,19 @@ class Produto(RenamableImageModel):
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     peso = models.DecimalField(max_digits=10, decimal_places=2)
     nota = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
-    id_loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
+    loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, null=True, blank=True, on_delete=models.SET_NULL)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
     image_field_name = 'photo'
 
     def __str__(self):
         return self.nome
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} adicionou {self.produto} a sua lista de desejos."

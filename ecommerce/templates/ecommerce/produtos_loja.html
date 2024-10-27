@@ -1,12 +1,12 @@
 {% extends "ecommerce/layout.html" %}
 
 {% block body %}
-    <h2>Produtos</h2>
 
-    <!-- Todos os produtos  -->
-    <div class="row">
-        {% for produto in produtos %}
-            <a href="{% url 'detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+    <h2>{{ loja }}</h2>
+
+    {% if produtos %}
+        <div class="row">
+            {% for produto in produtos %}
                 <div class="col-12 mb-4">
                     <div class="card h-100">
                         <div class="row no-gutters">
@@ -17,18 +17,19 @@
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h5 class="card-title"><strong>{{ produto }}</strong></h5>
-                                    <p><strong>${{ produto.preco }}</strong></p>
+                                    <p><strong>R$ {{ produto.preco }}</strong></p>
                                     <p>{{ produto.descricao }}</p>
-                                    <div>
-                                        <p>{{ produto.loja.nome }} <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="80px" height="80px"></p>
-                                    </div>
+                                    <p>{{ produto.nota }} </p>
+                                    <p>{{ produto.categoria.nome }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </a>
-        {% endfor %}
-    </div>
-    
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Esse loja ainda não possui nenhum produto.</p>
+    {% endif %}
+
 {% endblock body %}

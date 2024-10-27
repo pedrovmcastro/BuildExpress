@@ -18,11 +18,14 @@
             <a class="nav-link" href="{% url 'index' %}">Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link">Departamentos</a>
+            <a class="nav-link" href="{% url 'categorias' %}">Departamentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'lojas' %}">Lojas</a>
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link">Wishlist</a>
+            <a class="nav-link" href="{% url 'wishlist' %}">Lista de Desejos</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
@@ -36,7 +39,7 @@
         </li>
         {% endif %}
     </ul>
-    <main>
+    <main class="container">
         {% block body %}
         {% endblock body %}
     </main>
