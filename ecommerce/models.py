@@ -100,3 +100,13 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user} adicionou {self.produto} a sua lista de desejos."
+    
+
+class Comentario(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    content = models.TextField()
+    datetime_submited = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} comentou na página do {self.produto} às {self.datetime_submited}"
