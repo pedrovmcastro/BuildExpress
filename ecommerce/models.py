@@ -72,6 +72,8 @@ class Categoria(RenamableImageModel):
     nome = models.CharField(max_length=50)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
 
+    image_field_name = 'photo'
+
     def __str__(self):
         return self.nome
 
@@ -90,3 +92,11 @@ class Produto(RenamableImageModel):
 
     def __str__(self):
         return self.nome
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} adicionou {self.produto} a sua lista de desejos."
