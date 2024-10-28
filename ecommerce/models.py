@@ -84,7 +84,7 @@ class Produto(RenamableImageModel):
     descricao = models.TextField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     peso = models.DecimalField(max_digits=10, decimal_places=2)
-    nota = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
+    nota = models.DecimalField(max_digits=3, decimal_places=2, default=None, null=True, blank=True)
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, null=True, blank=True, on_delete=models.SET_NULL)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
@@ -106,9 +106,10 @@ class Wishlist(models.Model):
 class Avaliacao(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100, default=None)
     conteudo = models.TextField()
     nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
-    datetime_submited = models.DateTimeField(auto_now_add=True)
+    datetime = models.DateTimeField(auto_now_add=True)
     recomenda = models.BooleanField()
 
     def __str__(self):
