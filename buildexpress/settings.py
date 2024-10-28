@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #my_apps
     'ecommerce',
+    'empresarial'
 
     #default_apps
     'django.contrib.admin',
