@@ -141,9 +141,11 @@ def detalhes_produto(request, id_produto):
     if request.user.is_authenticated:
         in_wishlist = Wishlist.objects.filter(user=request.user, produto=produto).exists()
         form_avaliacao = forms.FormAvaliacao()
+        usuario_ja_avaliou = Avaliacao.objects.filter(produto=produto, user=request.user).exists()
     else:
         in_wishlist = False
         form_avaliacao = None
+        usuario_ja_avaliou = False
 
     # Avaliacoes
     avaliacoes = Avaliacao.objects.filter(produto=produto)
@@ -151,6 +153,7 @@ def detalhes_produto(request, id_produto):
     return render(request, 'ecommerce/detalhes_produto.html', {
         'produto': produto,
         'in_wishlist': in_wishlist,
+        'usuario_ja_avaliou': usuario_ja_avaliou,
         'avaliacoes': avaliacoes,
         'form': form_avaliacao
     })
@@ -191,6 +194,7 @@ def fazer_avaliacao(request, id_produto):
 
             # Atualizar nota do produto
             produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
+            produto.avaliacoes += 1
             produto.save()
 
             return redirect('detalhes_produto', id_produto)
@@ -206,5 +210,10 @@ def fazer_avaliacao(request, id_produto):
 def deletar_avaliacao(request, id_produto, id_avaliacao):
     avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
     avaliacao.delete()
+    # Atualizar nota do produto
+    produto = get_object_or_404(Produto, id=id_produto)
+    produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
+    produto.avaliacoes -= 1
+    produto.save()
     return redirect('detalhes_produto', id_produto)
 
