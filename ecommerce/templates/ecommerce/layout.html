@@ -13,6 +13,11 @@
 </head>
 <body>
     <h1>BuildExpress</h1>
+    <div>
+        {% if user.is_authenticated %}
+            Bem-vindo <strong>{{ user.username }}</strong>!
+        {% endif %}
+    </div>
     <ul class="nav">
         <li class="nav-item">
             <a class="nav-link" href="{% url 'index' %}">Home</a>
