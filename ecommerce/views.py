@@ -3,9 +3,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.urls import reverse
 
-from .models import Produto, User, Loja, Categoria, Wishlist
+from .models import Produto, User, Loja, Categoria, Wishlist, Avaliacao
+from . import forms
 
 
 def index(request):
@@ -135,15 +137,25 @@ def produtos_loja(request, id_loja):
 def detalhes_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
 
-    # Lógica da Wishlist
+    # Lógica da Wishlist e Fazer Avaliacoes
     if request.user.is_authenticated:
         in_wishlist = Wishlist.objects.filter(user=request.user, produto=produto).exists()
+        form_avaliacao = forms.FormAvaliacao()
+        usuario_ja_avaliou = Avaliacao.objects.filter(produto=produto, user=request.user).exists()
     else:
         in_wishlist = False
+        form_avaliacao = None
+        usuario_ja_avaliou = False
+
+    # Avaliacoes
+    avaliacoes = Avaliacao.objects.filter(produto=produto)
 
     return render(request, 'ecommerce/detalhes_produto.html', {
         'produto': produto,
-        'in_wishlist': in_wishlist
+        'in_wishlist': in_wishlist,
+        'usuario_ja_avaliou': usuario_ja_avaliou,
+        'avaliacoes': avaliacoes,
+        'form': form_avaliacao
     })
 
 
@@ -166,3 +178,42 @@ def acionar_wishlist(request, id_produto):
         Wishlist.objects.create(user=request.user, produto=produto)
     
     return redirect('detalhes_produto', id_produto)
+
+
+@login_required
+def fazer_avaliacao(request, id_produto):
+    if request.method == "POST":
+        form_avaliacao = forms.FormAvaliacao(request.POST)
+
+        if form_avaliacao.is_valid():
+            produto = get_object_or_404(Produto, id=id_produto)
+            avaliacao = form_avaliacao.save(commit=False)
+            avaliacao.user = request.user
+            avaliacao.produto = produto
+            avaliacao.save()
+
+            # Atualizar nota do produto
+            produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
+            produto.avaliacoes += 1
+            produto.save()
+
+            return redirect('detalhes_produto', id_produto)
+    else:
+        form_avaliacao = forms.FormAvaliacao()
+
+    return render(request, 'ecommerce/detalhes_produto.html', {
+        'form': form_avaliacao
+    })   
+
+
+@login_required
+def deletar_avaliacao(request, id_produto, id_avaliacao):
+    avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
+    avaliacao.delete()
+    # Atualizar nota do produto
+    produto = get_object_or_404(Produto, id=id_produto)
+    produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
+    produto.avaliacoes -= 1
+    produto.save()
+    return redirect('detalhes_produto', id_produto)
+
