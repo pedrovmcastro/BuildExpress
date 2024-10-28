@@ -17,12 +17,11 @@
 
                                 <div class="col-md-8">
                                     <div class="card-body">
+                                        <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
                                         <h5 class="card-title"><strong>{{ produto }}</strong></h5>
                                         <p><strong>${{ produto.preco }}</strong></p>
                                         <p>{{ produto.descricao }}</p>
-                                        <div>
-                                            <p>{{ produto.loja.nome }} <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="80px" height="80px"></p>
-                                        </div>
+                                        <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="100px" height="100px"> 
                                     </div>
                                 </div>
                             </div>

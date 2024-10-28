@@ -16,13 +16,18 @@
 
                             <div class="col-md-8">
                                 <div class="card-body">
+                                    <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
                                     <h5 class="card-title"><strong>{{ produto }}</strong></h5>
                                     <p><strong>${{ produto.preco }}</strong></p>
                                     <p>{{ produto.descricao }}</p>
-                                    <div>
-                                        <p>{{ produto.loja.nome }} <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="80px" height="80px"></p>
-                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="card mt-2">
+                            <div class="card-body text-center">
+                                <a href="{% url 'produtos_loja' produto.loja.id %}">
+                                    <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="60px" height="60px">
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -30,5 +35,6 @@
             </a>
         {% endfor %}
     </div>
+
     
 {% endblock body %}

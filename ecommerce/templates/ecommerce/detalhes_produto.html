@@ -4,6 +4,17 @@
     
     <h2>{{ produto }}</h2>
 
+    <!--Nota do produto-->
+    {% if produto.nota %}
+        <div class="mb-3">
+            {{ produto.nota }} ({{ produto.avaliacoes }})
+        </div>
+    {% else %}
+        <div class="mb-3">
+            Nenhuma avaliacao ({{ avaliacoes|length }})
+        </div>
+    {% endif %}
+
     <!--Lógica da Wishlist -->
     {% if user.is_authenticated %}
 
@@ -69,7 +80,7 @@
         {% endif %}
 
         <!--Adicionar uma avaliacao-->
-        {% if user.is_authenticated %}   
+        {% if user.is_authenticated and not usuario_ja_avaliou %}   
             <div>
                 <form method="post" action="{% url 'fazer_avaliacao' produto.id %}">
                     {% csrf_token %}
