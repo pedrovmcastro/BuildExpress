@@ -1,0 +1,19 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Cadastre sua loja{% endblock title %}
+
+{% block body %}
+    <h2>Responsável da loja</h2>
+    <p>Informe os dados da pessoa que tem o nome no contrato social da empresa, seja como dona, sócia ou sócia administrativa</p>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="submit" value="Continuar">
+    </form>
+
+{% endblock body %}

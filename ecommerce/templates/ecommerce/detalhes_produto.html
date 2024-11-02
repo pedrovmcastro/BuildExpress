@@ -18,7 +18,7 @@
     <!--Lógica da Wishlist -->
     {% if user.is_authenticated %}
 
-        <form method="post" action="{% url 'acionar_wishlist' produto.id %}">
+        <form method="post" action="{% url 'ecommerce:acionar_wishlist' produto.id %}">
             {% csrf_token %}
             {% if in_wishlist %}
                 <input type="submit" value="Remover da Lista de Favoritos" class="btn btn-danger">
@@ -46,7 +46,7 @@
                 <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="100px" height="100px">
             </div>
         </div>
-        <p>Categoria: <a href="{% url 'produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
+        <p>Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
     </div>
 
     <!--Avaliacoes de usuarios-->
@@ -65,7 +65,7 @@
                         <p>Recomenda esse produto: {{ avaliacao.recomenda }}</p>
                         <!--Deletar avaliacao-->
                         {% if avaliacao.user == request.user %}
-                            <form method="post" action="{% url 'deletar_avaliacao' id_produto=produto.id id_avaliacao=avaliacao.id %}">
+                            <form method="post" action="{% url 'ecommerce:deletar_avaliacao' id_produto=produto.id id_avaliacao=avaliacao.id %}">
                                 {% csrf_token %}
                                 <input type="submit" value="Deletar" class="btn btn-danger">
                             </form>
@@ -82,7 +82,7 @@
         <!--Adicionar uma avaliacao-->
         {% if user.is_authenticated and not usuario_ja_avaliou %}   
             <div>
-                <form method="post" action="{% url 'fazer_avaliacao' produto.id %}">
+                <form method="post" action="{% url 'ecommerce:fazer_avaliacao' produto.id %}">
                     {% csrf_token %}
                     {{ form.as_p }}
                     <input class="btn btn-primary" type="submit" value="Avaliar">

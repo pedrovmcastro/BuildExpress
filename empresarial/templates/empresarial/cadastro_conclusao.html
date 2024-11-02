@@ -1,0 +1,49 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Confirmação do Cadastro{% endblock title %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>Confirmação do Cadastro</h1>
+    
+    <h2 class="mt-4">Dados do Lojista</h2>
+    <p><strong>Nome:</strong> {{ lojista_nome }}</p>
+    <p><strong>Email:</strong> {{ lojista_email }}</p>
+    <p><strong>Telefone:</strong> {{ lojista_telefone }}</p>
+
+    <h2 class="mt-4">Dados do Endereço</h2>
+    <p><strong>CEP:</strong> {{ loja_cep }}</p>
+    <p><strong>Estado:</strong> {{ loja_estado }}</p>
+    <p><strong>Cidade:</strong> {{ loja_cidade }}</p>
+    <p><strong>Bairro:</strong> {{ loja_bairro }}</p>
+    <p><strong>Logradouro:</strong> {{ loja_logradouro }}</p>
+    <p><strong>Número:</strong> {{ loja_numero }}</p>
+
+    <h2 class="mt-4">Dados da Loja</h2>
+    <p><strong>Nome da Loja:</strong> {{ loja_nome }}</p>
+    <p><strong>CNPJ:</strong> {{ loja_cnpj }}</p>
+    <p><strong>Telefone da Loja:</strong> {{ loja_telefone }}</p>
+    <p><strong>Nome do Responsável:</strong> {{ responsavel_nome }}</p>
+    <p><strong>CPF do Responsável:</strong> {{ responsavel_cpf }}</p>
+    <p><strong>Plano:</strong> {{ loja_plano }}</p>
+
+    {% if error %}
+        <div class="alert alert-danger mt-4">
+            <strong>Erro:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="mt-5 d-flex justify-content-between">
+        <!-- Botão para confirmar cadastro -->
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirmar Cadastro</button>
+        </form>
+
+        <!-- Botão para editar cadastro -->
+        <form method="get" action="{% url 'empresarial:editar_cadastro' %}">
+            <button type="submit" class="btn btn-warning">Editar Dados</button>
+        </form>
+    </div>
+</div>
+{% endblock body %}

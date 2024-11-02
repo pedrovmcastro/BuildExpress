@@ -4,10 +4,12 @@ from django.conf.urls.static import static
 
 from . import views
 
+app_name = 'ecommerce'
+
 urlpatterns = [
     path("", views.index, name="index"),
-    path("login", views.login_view, name="login"),
-    path("logout", views.logout_view, name="logout"),
+    path("login", views.UsuarioComumLoginView.as_view(), name="login"),
+    path("logout", views.UsuarioComumLogoutView.as_view(), name="logout"),
     path("register", views.register, name="register"),
     path("categorias", views.categorias, name="categorias"),
     path("categorias/<int:id_categoria>", views.produtos_categoria, name="produtos_categoria"),

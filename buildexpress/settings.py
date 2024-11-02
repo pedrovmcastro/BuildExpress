@@ -34,7 +34,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #my_apps
     'ecommerce',
-    'empresarial'
+    'empresarial',
+    'entregas',
 
     #default_apps
     'django.contrib.admin',
@@ -90,7 +91,14 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'ecommerce.User'
+AUTH_USER_MODEL = 'ecommerce.UsuarioComum'
+
+AUTHENTICATION_BACKENDS = [
+    'ecommerce.backends.UsuarioComumBackend',    # Backend para UsuarioComum
+    'empresarial.backends.LojistaBackend',       # Backend para Lojista
+    'entregas.backends.MotoristaBackend',        # Backend para Motorista
+    'django.contrib.auth.backends.ModelBackend', # Backend padrão para funcionalidades adicionais
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

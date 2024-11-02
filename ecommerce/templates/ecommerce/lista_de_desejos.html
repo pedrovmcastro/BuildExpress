@@ -7,7 +7,7 @@
     {% if wishlist %}
         <div class="row">
             {% for produto in wishlist %}
-                <a href="{% url 'detalhes_produto' produto.id %}" class="text-decoration-none">
+                <a href="{% url 'ecommerce:detalhes_produto' produto.id %}" class="text-decoration-none">
                     <div class="col-12 mb-4">
                         <div class="card h-100">
                             <div class="row no-gutters">

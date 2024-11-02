@@ -1,0 +1,38 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Cadastre sua loja{% endblock title %}
+
+{% block body %}
+    <h2>Cadastre uma senha forte</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}  <!-- Exibe erros gerais -->
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password }}  <!-- Renderiza o campo de senha -->
+            {{ form.password.errors }}  <!-- Exibe erros para o campo de senha -->
+        </div>
+        <div class="form-group">
+            {{ form.confirmation.label }}
+            {{ form.confirmation }}  <!-- Renderiza o campo de confirmação -->
+            {{ form.confirmation.errors }}  <!-- Exibe erros para o campo de confirmação -->
+        </div>
+        <div class="password-info">
+            A senha deve conter:
+            <ul>
+                <li>Letra maíuscula</li>
+                <li>Letra minúscula</li>
+                <li>Mínimo de 10 caracteres</li>
+                <li>Número</li>
+                <li>Um símbolo(!, @, #, $, %, *)</li>
+            </ul>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Cadastrar agora">
+    </form>
+
+{% endblock body %}

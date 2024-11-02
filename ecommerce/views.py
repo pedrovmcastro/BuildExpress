@@ -5,8 +5,9 @@ from django.http import HttpResponseRedirect
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.urls import reverse
+from django.views import View
 
-from .models import Produto, User, Loja, Categoria, Wishlist, Avaliacao
+from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao
 from . import forms
 
 
@@ -16,34 +17,38 @@ def index(request):
     })
 
 
-def login_view(request):
-    if request.method == "POST":
+class UsuarioComumLoginView(View):
 
-        # Tentativa do usuário logar
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
+    def get(self, request):
+        form = forms.UsuarioComumLoginForm()
+        return render(request, "ecommerce/login.html", {
+            "form": form
+        })
 
-        # Checar se a autenticação foi bem sucedida
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("index"))
-        else:
-            return render(request, "ecommerce/login.html", {
-                "message": "Usuário e/ou senha inválidos"
-            })    
-    else:
-        return render(request, "ecommerce/login.html")
+    def post(self, request):
+        form = forms.UsuarioComumLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            if user:
+                login(request, user)
+                return redirect("ecommerce:index")
+            
+        return render(request, "ecommerce/login.html", {
+            "form": form,
+            "error": "Usuário e/ou senha inválidos"
+        })
 
-@login_required
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("index"))
+
+class UsuarioComumLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect("ecommerce:login")
 
 
 def register(request):
     if request.method == "POST":
-        username = request.POST["username"]
         email = request.POST["email"]
         telefone = request.POST["telefone"]
         nome = request.POST["nome"]
@@ -57,34 +62,27 @@ def register(request):
                 "message": "Senhas não batem."
             })
         
-        # Checar se o username já existe
-        if User.objects.filter(username=username).exists():
-            return render(request, "ecommerce/register.html", {
-                "message": "Nome de usuário já existe."
-            })
-        
         # Checar se o email já existe
-        if User.objects.filter(email=email).exists():
+        if UsuarioComum.objects.filter(email=email).exists():
             return render(request, "ecommerce/register.html", {
                 "message": "E-mail já cadastrado."
             })
         
         # Checar se o CPF já existe
-        if User.objects.filter(cpf=cpf).exists():
+        if UsuarioComum.objects.filter(cpf=cpf).exists():
             return render(request, "ecommerce/register.html", {
                 "message": "CPF já cadastrado."
             })
         
         # Checar se o telefone já existe
-        if User.objects.filter(telefone=telefone).exists():
+        if UsuarioComum.objects.filter(telefone=telefone).exists():
             return render(request, "ecommerce/register.html", {
                 "message": "Telefone já cadastrado."
             })
 
         # Tentativa de cadastrar novo usuário
         try:
-            user = User.objects.create_user(
-                username=username,
+            user = UsuarioComum.objects.create_user(
                 email=email,
                 password=password,
                 nome=nome,
@@ -96,8 +94,10 @@ def register(request):
             return render(request, "ecommerce/register.html", {
                 "message": "Erro ao tentar criar o usuário. Tente novamente."
             })
-        login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        
+        login(request, user, backend='ecommerce.backends.UsuarioComumBackend')
+
+        return HttpResponseRedirect(reverse("ecommerce:index"))
     else:
         return render(request, "ecommerce/register.html")
 
@@ -210,6 +210,7 @@ def fazer_avaliacao(request, id_produto):
 def deletar_avaliacao(request, id_produto, id_avaliacao):
     avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
     avaliacao.delete()
+
     # Atualizar nota do produto
     produto = get_object_or_404(Produto, id=id_produto)
     produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']

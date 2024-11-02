@@ -1,0 +1,18 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Cadastre sua loja{% endblock title %}
+
+{% block body %}
+    <h2>Cadastre sua loja</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="submit" value="Cadastrar agora">
+    </form>
+
+{% endblock body %}

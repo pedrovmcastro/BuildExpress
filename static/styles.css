@@ -1,3 +1,71 @@
 .form-control {
     margin: 10px;
 }
+
+.top-nav {
+    background-color: #ff6600;
+    padding: 10px;
+}
+
+.top-nav .nav-link {
+    color: white;
+    font-weight: bold;
+    margin: 0 15px;
+}
+
+.top-nav .nav-link:hover {
+    color: #ffddcc;
+}
+
+.main-header {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.nav {
+    justify-content: center;
+}
+
+.plano-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.plano-option {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    width: 48%;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.plano-option input {
+    display: none; /* Oculta o input radio */
+}
+
+.plano-option label {
+    display: block;
+    margin: 0;
+}
+
+.plano-option:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.plano-option input:checked + label {
+    background-color: #f0f8ff; /* Cor de fundo quando selecionado */
+    border: 1px solid #007bff; /* Borda quando selecionado */
+}
+
+.plano-item-titulo {
+    font-size: 1.5em; /* Tamanho da fonte para o título */
+    font-weight: bold; /* Negrito */
+}
+
+.plano-item-descricao {
+    font-size: 0.9em; /* Tamanho da fonte para a descrição */
+    color: gray; /* Cor cinza */
+}

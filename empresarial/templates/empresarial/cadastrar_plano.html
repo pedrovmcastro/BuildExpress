@@ -1,0 +1,63 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Cadastre sua loja{% endblock title %}
+
+{% block body %}
+    <h2>Planos BuildExpress</h2>
+    <p>Selecione o plano ideal para sua loja</p>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="plano-container">
+            <div class="plano-option">
+                <input type="radio" id="plano_basico" name="plano" value="basico" required>
+                <label for="plano_basico">
+                    <h3>Plano Básico</h3>
+                    <p>Entregas feitas pela própria loja.</p>
+                    <ul>
+                        <li>
+                            <span class="plano-item-titulo">8%</span>
+                            <span class="plano-item-descricao"> Comissão</span>
+                        </li>
+                        <li>
+                            <span class="plano-item-titulo">R$ 80/mês</span>
+                            <span class="plano-item-descricao"> Mensalidade para faturamento acima de R$ 1.800.</span>
+                        </li>
+                        <li>
+                            <span class="plano-item-titulo">3.2%</span>
+                            <span class="plano-item-descricao"> Taxa para pedidos pagos via BuildExpress.</span>
+                        </li>
+                    </ul>
+                </label>
+            </div>
+    
+            <div class="plano-option">
+                <input type="radio" id="plano_entrega" name="plano" value="entrega" required>
+                <label for="plano_entrega">
+                    <h3>Plano Entrega</h3>
+                    <p>Entregas feitas por parceiros BuildExpress.</p>
+                    <ul>
+                        <li>
+                            <span class="plano-item-titulo">19%</span>
+                            <span class="plano-item-descricao"> Comissão</span>
+                        </li>
+                        <li>
+                            <span class="plano-item-titulo">R$ 120/mês</span>
+                            <span class="plano-item-descricao"> Mensalidade para faturamento acima de R$ 1.800.</span>
+                        </li>
+                        <li>
+                            <span class="plano-item-titulo">3.2%</span>
+                            <span class="plano-item-descricao"> Taxa para pedidos pagos via BuildExpress.</span>
+                        </li>
+                    </ul>
+                </label>
+            </div>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Continuar">
+    </form>
+
+{% endblock body %}
