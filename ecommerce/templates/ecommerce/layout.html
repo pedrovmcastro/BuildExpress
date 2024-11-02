@@ -12,41 +12,53 @@
     <link type="text/css" href="{% static 'styles.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h1>BuildExpress</h1>
-    <div>
+    <!-- Barra superior com links para Empresarial e Entregador -->
+    <nav class="top-nav d-flex justify-content-center">
+        <a class="nav-link" href="{% url 'ecommerce:index' %}">Home</a>
+        <a class="nav-link" href="{% url 'empresarial:cadastro_inicial' %}">Empresarial</a>
+        <a class="nav-link" href="{% url 'entregas:motorista_login' %}">Entregador</a>
+    </nav>
+
+    <!-- Título e saudação -->
+    <header class="main-header">
+        <h1>BuildExpress</h1>
+        <div>
+            {% if user.is_authenticated %}
+                Bem-vindo <strong>{{ user.email }}</strong>!
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Navegação principal -->
+    <ul class="nav nav-pills jutify-content-center mb-4">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'ecommerce:categorias' %}">Departamentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'ecommerce:lojas' %}">Lojas</a>
+        </li>
         {% if user.is_authenticated %}
-            Bem-vindo <strong>{{ user.username }}</strong>!
-        {% endif %}
-    </div>
-    <ul class="nav">
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'index' %}">Home</a>
+            <a class="nav-link" href="{% url 'ecommerce:wishlist' %}">Lista de Desejos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'categorias' %}">Departamentos</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'lojas' %}">Lojas</a>
-        </li>
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'wishlist' %}">Lista de Desejos</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+            <a class="nav-link" href="{% url 'ecommerce:logout' %}">Log Out</a>
         </li>
         {% else %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'login' %}">Log In</a>
+            <a class="nav-link" href="{% url 'ecommerce:login' %}">Log In</a>
         </li>   
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'register' %}">Register</a>
+            <a class="nav-link" href="{% url 'ecommerce:register' %}">Registrar</a>
         </li>
         {% endif %}
     </ul>
+
+    <!-- Conteúdo da página -->
     <main class="container">
         {% block body %}
         {% endblock body %}
     </main>
+    
 </body>
 </html>

@@ -1,0 +1,14 @@
+{% extends "entregas/layout.html" %}
+
+{% block title %}Registrar{% endblock title %}
+
+{% block body %}
+    <h1>Registro de Motorista</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar</button>
+    </form>
+
+{% endblock body %}

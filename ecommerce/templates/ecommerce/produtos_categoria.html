@@ -7,7 +7,7 @@
     {% if produtos %}
         <div class="row">
             {% for produto in produtos %}
-                <a href="{% url 'detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+                <a href="{% url 'ecommerce:detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
                     <div class="col-12 mb-4">
                         <div class="card h-100">
                             <div class="row no-gutters">

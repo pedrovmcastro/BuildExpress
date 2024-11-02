@@ -6,7 +6,7 @@
     <!-- Todos os produtos  -->
     <div class="row">
         {% for produto in produtos %}
-            <a href="{% url 'detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+            <a href="{% url 'ecommerce:detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
                 <div class="col-12 mb-4">
                     <div class="card h-100">
                         <div class="row no-gutters">
@@ -25,7 +25,7 @@
                         </div>
                         <div class="card mt-2">
                             <div class="card-body text-center">
-                                <a href="{% url 'produtos_loja' produto.loja.id %}">
+                                <a href="{% url 'ecommerce:produtos_loja' produto.loja.id %}">
                                     <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="60px" height="60px">
                                 </a>
                             </div>

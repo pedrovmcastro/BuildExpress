@@ -22,3 +22,4 @@ def rename_image(instance, filename):
         # Se o objeto ainda não tiver um ID, retorna o nome original com a subpasta
         subfolder = instance.__class__.__name__.lower() + "s/"
         return os.path.join(subfolder, filename)
+    
