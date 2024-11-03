@@ -1,1 +1,11 @@
-<p>Você está logado</p>
+{% extends "entregas/layout.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block body %}
+    <h2>Home do Motorista</h2>
+
+    <p>Você está logado como: {{ user }}</p>
+    <p>Request user: {{ request.user }}</p>
+
+{% endblock body %}

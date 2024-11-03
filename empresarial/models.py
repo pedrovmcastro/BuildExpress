@@ -28,6 +28,10 @@ class Lojista(AbstractBaseUser):
     def __str__(self):
         return self.email
     
+    @property
+    def is_lojista(self):
+        return True
+    
 
 class Plano(models.Model):
     TIPO_CHOICES = [

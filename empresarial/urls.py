@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from . import views
 
@@ -16,3 +18,7 @@ urlpatterns = [
     path("cadastro/senha", views.cadastrar_senha, name="cadastrar_senha"),
     path("cadastro/conclusao", views.concluir_cadastro, name="concluir_cadastro"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

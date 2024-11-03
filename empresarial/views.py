@@ -40,9 +40,9 @@ class LojistaLoginView(View):
     
 
 class LojistaLogoutView(View):
-    def post(self, request):
+    def get(self, request):
         logout(request)
-        return redirect("empresarial:login")
+        return redirect("empresarial:lojista_login")
 
 
 def cadastro_inicial(request):
@@ -55,6 +55,9 @@ def cadastro_inicial(request):
             request.session['lojista_telefone'] = form.cleaned_data['telefone']
 
             return redirect('empresarial:cadastrar_endereco')
+    
+    if request.user.is_authenticated and request.user.is_lojista:
+            return redirect('empresarial:index')
 
     form = LojistaForm()
     return render(request, 'empresarial/cadastro_inicial.html', {'form': form})

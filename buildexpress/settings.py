@@ -100,6 +100,16 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', # Backend padrão para funcionalidades adicionais
 ]
 
+# URL de login padrão (caso algum redirecionamento seja genérico)
+LOGIN_URL = 'ecommerce:login'
+
+# URLs específicas para cada tipo de usuário
+LOGIN_URLS = {
+    'lojista': 'empresarial:lojista_login',
+    'motorista': 'entregas:motorista_login',
+    'usuario_comum': 'ecommerce:login'
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -117,6 +127,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Configurações de sessão
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa o banco de dados para armazenar sessões
+SESSION_COOKIE_NAME = 'sessionid'  # Nome do cookie da sessão
 
 
 # Internationalization

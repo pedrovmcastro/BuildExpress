@@ -10,3 +10,12 @@ class MotoristaBackend(BaseBackend):
                 return user
         except Motorista.DoesNotExist:
             return None
+        
+    def get_user(self, user_id):
+        try:
+            return Motorista.objects.get(pk=user_id)
+        except Motorista.DoesNotExist:
+            return None
+        
+
+   
