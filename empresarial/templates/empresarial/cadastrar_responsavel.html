@@ -10,7 +10,7 @@
         <div>{{ message }}</div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" mt="mt-3">
         {% csrf_token %}
         {{ form.as_p }}
         <input class="btn btn-primary" type="submit" value="Continuar">

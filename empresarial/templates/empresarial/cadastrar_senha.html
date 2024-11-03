@@ -9,7 +9,7 @@
         <div>{{ message }}</div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" class="mt-3">
         {% csrf_token %}
         {{ form.non_field_errors }}  <!-- Exibe erros gerais -->
         <div class="form-group">

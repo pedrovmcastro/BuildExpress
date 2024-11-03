@@ -8,8 +8,20 @@ class BaseLoginForm(forms.Form):
     Este formulário requer que o usuário forneça um endereço de email e uma senha.
     A validação é realizada para garantir que ambos os campos sejam preenchidos.
     """
-    email = forms.EmailField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'joao@email.com'
+        })
+    )
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Senha'
+        })
+    )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -20,10 +32,9 @@ class BaseLoginForm(forms.Form):
             raise forms.ValidationError("Por favor, preencha todos os campos.")
 
         return cleaned_data
-    
 
 class LojistaLoginForm(BaseLoginForm):
-    pass 
+    pass
 
 
 class LojistaForm(forms.Form):

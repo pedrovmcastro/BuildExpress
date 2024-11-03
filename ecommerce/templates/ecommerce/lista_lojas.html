@@ -11,7 +11,9 @@
                 <a href="{% url 'ecommerce:produtos_loja' loja.id %}" class="text-decoration-none">
                     <div class="card h-100 text-center">
                         <div class="card-body">
-                            <img src="{{ loja.logo.url }}" alt="{{ loja }}" width="100%" height="260px">
+                            {% if loja.logo %}
+                                <img src="{{ loja.logo.url }}" alt="{{ loja }}" width="100%" height="260px">
+                            {% endif %}
                             <h5 class="card-title">{{ loja }}</h5>
                         </div>
                     </div>
