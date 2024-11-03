@@ -33,7 +33,6 @@ class BaseLoginForm(forms.Form):
 
         return cleaned_data
 
-
 class LojistaLoginForm(BaseLoginForm):
     pass
 

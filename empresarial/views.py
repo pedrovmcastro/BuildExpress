@@ -130,20 +130,20 @@ def concluir_cadastro(request):
     if request.method == "POST":
         # Dados do lojista
         lojista_data = {
-            'nome': request.session.get('lojista_nome'),
-            'email': request.session.get('lojista_email'),
-            'telefone': request.session.get('lojista_telefone'),
+            'nome': request.POST.get('lojista_nome'),
+            'email': request.POST.get('lojista_email'),
+            'telefone': request.POST.get('lojista_telefone'),
             'password': make_password(request.session.get('lojista_senha'))  # Aqui você deve hashear a senha
         }
 
         # Dados do endereço
         endereco_data = {
-            'cep': request.session.get('loja_cep'),
-            'estado': request.session.get('loja_estado'),
-            'cidade': request.session.get('loja_cidade'),
-            'bairro': request.session.get('loja_bairro'),
-            'logradouro': request.session.get('loja_logradouro'),
-            'numero': request.session.get('loja_numero')
+            'cep': request.POST.get('loja_cep'),
+            'estado': request.POST.get('loja_estado'),
+            'cidade': request.POST.get('loja_cidade'),
+            'bairro': request.POST.get('loja_bairro'),
+            'logradouro': request.POST.get('loja_logradouro'),
+            'numero': request.POST.get('loja_numero')
         }
 
         try:
@@ -160,11 +160,11 @@ def concluir_cadastro(request):
         
         # Dados da loja
         loja_data = {
-            'nome': request.session.get('loja_nome'),
-            'cnpj': request.session.get('loja_cnpj'),
-            'telefone': request.session.get('loja_telefone'),
-            'nome_responsavel': request.session.get('responsavel_nome'),
-            'cpf_responsavel': request.session.get('responsavel_cpf'),
+            'nome': request.POST.get('loja_nome'),
+            'cnpj': request.POST.get('loja_cnpj'),
+            'telefone': request.POST.get('loja_telefone'),
+            'nome_responsavel': request.POST.get('responsavel_nome'),
+            'cpf_responsavel': request.POST.get('responsavel_cpf'),
             'plano': plano,
             'endereco': endereco,
             'lojista': lojista
@@ -184,23 +184,4 @@ def concluir_cadastro(request):
     return render(request, 'empresarial/cadastro_conclusao.html', {
         **request.session  # Passa todos os dados da sessão para o template
     })
-
-
-def editar_cadastro(request):
-    if request.method == 'POST':
-        form = CadastroForm(request.POST)
-        if form.is_valid():
-            form.save(request.session)
-            return redirect('empresarial:cadastro_conclusao')
-    else:
-        # Configurando o formulário com valores iniciais da sessão
-        form = CadastroForm(initial={
-            'lojista': request.session.get('lojista'),
-            'endereco': request.session.get('endereco'),
-            'responsavel': request.session.get('responsavel'),
-            'loja': request.session.get('loja'),
-            'plano': request.session.get('plano'),
-        })
-
-    return render(request, 'empresarial/cadastro_editar.html', {'form': form})
 
