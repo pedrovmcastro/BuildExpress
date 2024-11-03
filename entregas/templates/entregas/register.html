@@ -3,9 +3,9 @@
 {% block title %}Registrar{% endblock title %}
 
 {% block body %}
-    <h1>Registro de Motorista</h1>
+    <h2>Registro de Motorista</h2>
 
-    <form method="post">
+    <form method="post" class="mt-3">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Registrar</button>
