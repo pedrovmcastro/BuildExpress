@@ -5,45 +5,89 @@
 {% block body %}
 <div class="container mt-5">
     <h1>Confirmação do Cadastro</h1>
-    
-    <h2 class="mt-4">Dados do Lojista</h2>
-    <p><strong>Nome:</strong> {{ lojista_nome }}</p>
-    <p><strong>Email:</strong> {{ lojista_email }}</p>
-    <p><strong>Telefone:</strong> {{ lojista_telefone }}</p>
-
-    <h2 class="mt-4">Dados do Endereço</h2>
-    <p><strong>CEP:</strong> {{ loja_cep }}</p>
-    <p><strong>Estado:</strong> {{ loja_estado }}</p>
-    <p><strong>Cidade:</strong> {{ loja_cidade }}</p>
-    <p><strong>Bairro:</strong> {{ loja_bairro }}</p>
-    <p><strong>Logradouro:</strong> {{ loja_logradouro }}</p>
-    <p><strong>Número:</strong> {{ loja_numero }}</p>
-
-    <h2 class="mt-4">Dados da Loja</h2>
-    <p><strong>Nome da Loja:</strong> {{ loja_nome }}</p>
-    <p><strong>CNPJ:</strong> {{ loja_cnpj }}</p>
-    <p><strong>Telefone da Loja:</strong> {{ loja_telefone }}</p>
-    <p><strong>Nome do Responsável:</strong> {{ responsavel_nome }}</p>
-    <p><strong>CPF do Responsável:</strong> {{ responsavel_cpf }}</p>
-    <p><strong>Plano:</strong> {{ loja_plano }}</p>
 
     {% if error %}
         <div class="alert alert-danger mt-4">
             <strong>Erro:</strong> {{ error }}
         </div>
     {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
 
-    <div class="mt-5 d-flex justify-content-between">
-        <!-- Botão para confirmar cadastro -->
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">Confirmar Cadastro</button>
-        </form>
+        <h2 class="mt-4">Dados do Lojista</h2>
 
-        <!-- Botão para editar cadastro -->
-        <form method="get" action="{% url 'empresarial:editar_cadastro' %}">
-            <button type="submit" class="btn btn-warning">Editar Dados</button>
-        </form>
-    </div>
+        <div class="form-group">
+            <label for="lojista_nome">Nome:</label>
+            <input type="text" class="form-control" id="lojista_nome" name="lojista_nome" value="{{ lojista_nome }}" required>
+        </div>
+        <div class="form-group">
+            <label for="lojista_email">Email:</label>
+            <input type="email" class="form-control" id="lojista_email" name="lojista_email" value="{{ lojista_email }}" required>
+        </div>
+        <div class="form-group">
+            <label for="lojista_telefone">Telefone:</label>
+            <input type="text" class="form-control" id="lojista_telefone" name="lojista_telefone" value="{{ lojista_telefone }}" required>
+        </div>
+
+        <h2 class="mt-4">Dados do Endereço</h2>
+
+        <div class="form-group">
+            <label for="loja_cep">CEP:</label>
+            <input type="text" class="form-control" id="loja_cep" name="loja_cep" value="{{ loja_cep }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_estado">Estado:</label>
+            <input type="text" class="form-control" id="loja_estado" name="loja_estado" value="{{ loja_estado }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_cidade">Cidade:</label>
+            <input type="text" class="form-control" id="loja_cidade" name="loja_cidade" value="{{ loja_cidade }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_bairro">Bairro:</label>
+            <input type="text" class="form-control" id="loja_bairro" name="loja_bairro" value="{{ loja_bairro }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_logradouro">Logradouro:</label>
+            <input type="text" class="form-control" id="loja_logradouro" name="loja_logradouro" value="{{ loja_logradouro }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_numero">Número:</label>
+            <input type="text" class="form-control" id="loja_numero" name="loja_numero" value="{{ loja_numero }}" required>
+        </div>
+
+        <h2 class="mt-4">Dados da Loja</h2>
+
+        <div class="form-group">
+            <label for="loja_nome">Nome da Loja:</label>
+            <input type="text" class="form-control" id="loja_nome" name="loja_nome" value="{{ loja_nome }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_cnpj">CNPJ:</label>
+            <input type="text" class="form-control" id="loja_cnpj" name="loja_cnpj" value="{{ loja_cnpj }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_telefone">Telefone da Loja:</label>
+            <input type="text" class="form-control" id="loja_telefone" name="loja_telefone" value="{{ loja_telefone }}" required>
+        </div>
+        <div class="form-group">
+            <label for="responsavel_nome">Nome do Responsável:</label>
+            <input type="text" class="form-control" id="responsavel_nome" name="responsavel_nome" value="{{ responsavel_nome }}" required>
+        </div>
+        <div class="form-group">
+            <label for="responsavel_cpf">CPF do Responsável:</label>
+            <input type="text" class="form-control" id="responsavel_cpf" name="responsavel_cpf" value="{{ responsavel_cpf }}" required>
+        </div>
+        <div class="form-group">
+            <label for="loja_plano">Plano:</label>
+            <select class="form-control" id="loja_plano" name="loja_plano" required>
+                <option value="basico" {% if loja_plano == "basico" %}selected{% endif %}>Básico</option>
+                <option value="premium" {% if loja_plano == "entrega" %}selected{% endif %}>Entrega</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Confirmar Cadastro</button>
+    </form>
 </div>
 {% endblock body %}

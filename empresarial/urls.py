@@ -15,5 +15,4 @@ urlpatterns = [
     path("cadastro/plano", views.cadastrar_plano, name="cadastrar_plano"),
     path("cadastro/senha", views.cadastrar_senha, name="cadastrar_senha"),
     path("cadastro/conclusao", views.concluir_cadastro, name="concluir_cadastro"),
-    path("cadastro/editar", views.editar_cadastro, name="editar_cadastro"),
 ]

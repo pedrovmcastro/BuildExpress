@@ -25,9 +25,6 @@
         <div>
             {% if lojista.is_authenticated %}
                 Logado na conta <strong>{{ lojista.email }}</strong>
-            {% else %}
-                <a href="{% url 'empresarial:lojista_login' %}" class="btn btn-primary">Entrar</a>
-                <a href="{% url 'empresarial:cadastro_inicial' %}" class="btn btn-secondary">Cadastrar</a>
             {% endif %}
         </div>
     </header>
