@@ -23,11 +23,27 @@
     <header class="main-header">
         <h1>BuildExpress</h1>
         <div>
-            {% if lojista.is_authenticated %}
-                Logado na conta <strong>{{ lojista.email }}</strong>
+            {% if user.is_authenticated and user.is_lojista %}
+                <p>Bem-vindo <strong>{{ user.email }}</strong></p>
             {% endif %}
         </div>
     </header>
+
+    <!-- Navegação principal -->
+    <ul class="nav nav-pills jutify-content-center mb-4">
+        {% if user.is_authenticated and user.is_lojista %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'empresarial:lojista_logout' %}">Log Out</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'empresarial:lojista_login' %}">Log In</a>
+        </li>   
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'empresarial:cadastro_inicial' %}">Registrar</a>
+        </li>
+        {% endif %}
+    </ul>
 
     <!-- Conteúdo da página -->
     <main class="container">

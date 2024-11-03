@@ -19,12 +19,12 @@
         <a class="nav-link" href="{% url 'entregas:motorista_login' %}">Entregador</a>
     </nav>
 
-    <!-- Título e saudação -->
+    <!-- Header - Titulo e Saudação -->
     <header class="main-header">
         <h1>BuildExpress</h1>
         <div>
-            {% if user.is_authenticated %}
-                Bem-vindo <strong>{{ user.email }}</strong>!
+            {% if user.is_authenticated and not user.is_lojista and not user.is_motorista %}
+                <p>Bem-vindo <strong>{{ user.email }}</strong>!</p>
             {% endif %}
         </div>
     </header>
@@ -37,7 +37,7 @@
         <li class="nav-item">
             <a class="nav-link" href="{% url 'ecommerce:lojas' %}">Lojas</a>
         </li>
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not user.is_lojista and not user.is_motorista %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'ecommerce:wishlist' %}">Lista de Desejos</a>
         </li>

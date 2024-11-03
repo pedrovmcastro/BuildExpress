@@ -11,3 +11,9 @@ class LojistaBackend(BaseBackend):
                 return user
         except Lojista.DoesNotExist:
             return None
+        
+    def get_user(self, user_id):
+        try:
+            return Lojista.objects.get(pk=user_id)
+        except Lojista.DoesNotExist:
+            return None

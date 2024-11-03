@@ -5,11 +5,15 @@ from .forms import MotoristaLoginForm, MotoristaRegisterForm
 
 
 def index(request):
-    return render(request, 'empresarial/index.html')
+    return render(request, 'entregas/index.html')
 
 
 class MotoristaLoginView(View):
     def get(self, request):
+
+        if request.user.is_authenticated and request.user.is_motorista:
+            return redirect('entregas:index')
+
         form = MotoristaLoginForm()
         return render(request, "entregas/login.html", {
             "form": form
@@ -23,7 +27,7 @@ class MotoristaLoginView(View):
             user = authenticate(request, email=email, password=password)
             if user:
                 login(request, user)
-                return redirect("entregas:index")
+                return redirect('entregas:index')
             
         return render(request, "entregas/login.html", {
             "form": form,
@@ -34,7 +38,7 @@ class MotoristaLoginView(View):
 class MotoristaLogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect("entregas:login")
+        return redirect("entregas:motorista_login")
     
 
 class MotoristaRegisterView(View):
