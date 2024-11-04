@@ -33,6 +33,10 @@ class Motorista(AbstractBaseUser):
         return self.email
     
     @property
+    def is_lojista(self):
+        return False
+    
+    @property
     def is_motorista(self):
         return True
 

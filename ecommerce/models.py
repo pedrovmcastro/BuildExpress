@@ -81,6 +81,16 @@ class UsuarioComum(AbstractBaseUser):
     def __str__(self):
         return self.email
     
+    @property
+    def is_lojista(self):
+        return False
+    
+    @property
+    def is_motorista(self):
+        return False
+    
+
+    
 
 class Endereco(models.Model):
     cep = models.CharField(max_length=15)

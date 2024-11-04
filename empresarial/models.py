@@ -32,6 +32,10 @@ class Lojista(AbstractBaseUser):
     def is_lojista(self):
         return True
     
+    @property
+    def is_motorista(self):
+        return False
+    
 
 class Plano(models.Model):
     TIPO_CHOICES = [
