@@ -25,6 +25,8 @@ class RenamableImageModel(models.Model):
         # Atualiza o nome da imagem se ela já foi carregada
         if image_field and not image_field.name.startswith(f"{self.__class__.__name__}{str(self.id).zfill(6)}"):
             old_path = image_field.path
+            print(f"Old path: {old_path}")
+
             image_field.name = utils.rename_image(self, image_field.name)
 
             # Salva o objeto novamente para atualizar o caminho no banco de dados
@@ -32,6 +34,8 @@ class RenamableImageModel(models.Model):
 
             # Renomeia o arquivo fisicamente
             new_path = image_field.path
+            print(f"New path: {new_path}")
+
             os.rename(old_path, new_path)
 
 
@@ -90,8 +94,6 @@ class UsuarioComum(AbstractBaseUser):
         return False
     
 
-    
-
 class Endereco(models.Model):
     cep = models.CharField(max_length=15)
     logradouro = models.CharField(max_length=100)
@@ -99,9 +101,6 @@ class Endereco(models.Model):
     bairro = models.CharField(max_length=100)
     cidade = models.CharField(max_length=50)
     estado = models.CharField(max_length=2, default=None)
-
-    # Relação muitos-para-muitos com UsuarioComum
-    usuarios = models.ManyToManyField(UsuarioComum, related_name='enderecos')
     
     def __str__(self):
         return f"{self.logradouro}, {self.numero}, {self.bairro}, {self.cidade} - {self.cep}"

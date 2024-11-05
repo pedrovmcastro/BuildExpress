@@ -16,7 +16,7 @@
     {% endif %}
 
     <!--Lógica da Wishlist -->
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and not user.is_lojista and not user.is_motorista %}
 
         <form method="post" action="{% url 'ecommerce:acionar_wishlist' produto.id %}">
             {% csrf_token %}
@@ -43,10 +43,16 @@
                 {{ produto.loja.nome }}
             </div>
             <div class="card-body">
-                <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="100px" height="100px">
+                {% if produto.loja.logo %}
+                    <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="100px" height="100px">
+                {% endif %}
             </div>
         </div>
-        <p>Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
+        {% if produto.categoria %}
+            <p>Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
+        {% else %}
+            <p>Sem categoria</p>
+        {% endif %}
     </div>
 
     <!--Avaliacoes de usuarios-->
@@ -80,7 +86,7 @@
         {% endif %}
 
         <!--Adicionar uma avaliacao-->
-        {% if user.is_authenticated and not usuario_ja_avaliou %}   
+        {% if user.is_authenticated and not usuario_ja_avaliou and not user.is_lojista and not user.is_motorista%}   
             <div>
                 <form method="post" action="{% url 'ecommerce:fazer_avaliacao' produto.id %}">
                     {% csrf_token %}

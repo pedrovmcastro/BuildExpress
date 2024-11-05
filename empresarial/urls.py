@@ -17,6 +17,8 @@ urlpatterns = [
     path("cadastro/plano", views.cadastrar_plano, name="cadastrar_plano"),
     path("cadastro/senha", views.cadastrar_senha, name="cadastrar_senha"),
     path("cadastro/conclusao", views.concluir_cadastro, name="concluir_cadastro"),
+    path("home/cadastro_produto", views.cadastrar_produto, name="cadastrar_produto"),
+    path("home/produto/<int:produto_id>", views.pagina_produto, name="pagina_produto")
 ]
 
 if settings.DEBUG:

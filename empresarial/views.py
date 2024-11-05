@@ -3,9 +3,9 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, CadastroForm
+from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, CadastroForm, ProdutoForm
 from .models import Lojista, Plano
-from ecommerce.models import Endereco, Loja
+from ecommerce.models import Endereco, Loja, Produto, RenamableImageModel
 from django.views import View
 from .forms import LojistaLoginForm, LojistaForm
 
@@ -187,4 +187,31 @@ def concluir_cadastro(request):
     return render(request, 'empresarial/cadastro_conclusao.html', {
         **request.session  # Passa todos os dados da sessão para o template
     })
+
+
+def pagina_produto(request, produto_id):
+    produto = get_object_or_404(Produto, id=produto_id)
+    return render(request, 'empresarial/pagina_produto.html', {
+        'produto': produto
+    })
+
+
+def cadastrar_produto(request):
+    if request.method == "POST":
+        form = ProdutoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            try:
+                produto = form.save(commit=False)
+                produto.loja = Loja.objects.filter(lojista=request.user).first()
+                produto.save()
+            except IntegrityError as e:
+                return render(request, 'empresarial/cadastrar_produto.html', {'error': str(e)})
+
+            return redirect('empresarial:pagina_produto', produto_id=produto.id)
+
+    form = ProdutoForm()
+    return render(request, 'empresarial/cadastrar_produto.html', {'form': form})
+
+
 
