@@ -12,12 +12,13 @@ from .forms import LojistaLoginForm, LojistaForm
 from .decorators import lojista_required
 
 
-@lojista_required
 def index(request):
-    produtos = Produto.objects.filter(loja__lojista=request.user)
-    return render(request, 'empresarial/index.html', {
-        'produtos': produtos
-    })
+    if request.user.is_authenticated and request.user.is_lojista:
+        produtos = Produto.objects.filter(loja__lojista=request.user)
+        return render(request, 'empresarial/index.html', {
+            'produtos': produtos
+        })
+    render(redirect("empresarial:cadastro_inicial"))
 
 
 class LojistaLoginView(View):
@@ -47,10 +48,7 @@ class LojistaLoginView(View):
 
 class LojistaLogoutView(View):
     @lojista_required
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-    
-    def get(self, request):
+    def dispatch(self, request, *args, **kwargs):
         logout(request)
         return redirect("empresarial:lojista_login")
 
