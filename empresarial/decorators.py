@@ -7,7 +7,7 @@ def lojista_required(view_func):
     @wraps(view_func)
     @login_required  # Garantir que o usuário esteja logado
     def _wrapped_view(request, *args, **kwargs):
-        if hasattr(request.user, 'lojista') and request.user.is_lojista:
+        if request.user.is_lojista:
             return view_func(request, *args, **kwargs)
         else:
             raise PermissionDenied  # Retorna erro 403 se não for um lojista

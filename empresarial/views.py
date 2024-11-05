@@ -47,8 +47,7 @@ class LojistaLoginView(View):
     
 
 class LojistaLogoutView(View):
-    @lojista_required
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request):
         logout(request)
         return redirect("empresarial:lojista_login")
 
@@ -256,5 +255,6 @@ def deletar_produto(request, id_produto):
         produto.delete()
         return redirect("empresarial:index")
     else:
+        print("else")
         raise PermissionDenied
     
