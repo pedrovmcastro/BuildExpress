@@ -4,7 +4,61 @@
 
 {% block body %}
     <h2>{{ produto }}</h2>
-    <p>{{ produto.descricao }}</p>
-    <p>{{ produto.preco }}</p>
+
+    <!--Nota do produto-->
+    {% if produto.nota %}
+        <div class="mb-3">
+            {{ produto.nota }} ({{ produto.avaliacoes }})
+        </div>
+    {% else %}
+        <div class="mb-3">
+            Nenhuma avaliacao ({{ avaliacoes|length }})
+        </div>
+    {% endif %}
+
+    <!--Detalhes do Produto -->
+    <div>
+        {% if produto.photo %}
+            <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="auto" height="400px">
+        {% endif %}
+        <p>{{ produto.descricao }}</p>
+        <h2>R$ {{ produto.preco }}</h2>
+    </div>
+
+    <!-- Categoria -->
+     <div>
+        {% if produto.categoria %}
+            <p>Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
+        {% else %}
+            <p>Sem categoria</p>
+        {% endif %}
+     </div>
+
+     <!--Avaliacoes de usuarios-->
+    <div class="mt-4">
+        <!--Lista de avaliacoes-->
+        <h3 class="mb-4">Avaliações</h3>
+        {% if avaliacoes %}
+            {% for avaliacao in avaliacoes %}
+                <div class="card mb-3">
+                    <!-- Avaliação do produto -->
+                    <div class="card-body">
+                        <p>Nota: {{ avaliacao.nota }}</p>
+                        <h6 class="card-title"><strong>{{ avaliacao.user.username }}</strong></h6>
+                        <p><small>{{ avaliacao.datetime }}</small></p>
+                        <h5><strong>{{ avaliacao.titulo }}</strong></h5>
+                        <p class="card-text">{{ avaliacao.conteudo }}</p>
+                        <p>Recomenda esse produto: {{ avaliacao.recomenda }}</p>
+                    </div>
+                    <!-- Responder avaliação -->
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-secondary" role="alert">
+                <h6>Ainda não há avaliações.</h6>
+            </div>
+        {% endif %}
+    </div>
+                
 
 {% endblock body %}

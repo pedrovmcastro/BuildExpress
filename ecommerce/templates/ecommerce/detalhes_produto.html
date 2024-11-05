@@ -86,7 +86,7 @@
         {% endif %}
 
         <!--Adicionar uma avaliacao-->
-        {% if user.is_authenticated and not usuario_ja_avaliou and not user.is_lojista and not user.is_motorista%}   
+        {% if user.is_authenticated and not usuario_ja_avaliou and not user.is_lojista and not user.is_motorista %}   
             <div>
                 <form method="post" action="{% url 'ecommerce:fazer_avaliacao' produto.id %}">
                     {% csrf_token %}
