@@ -9,8 +9,10 @@ from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoFo
 from .models import Lojista, Plano
 from ecommerce.models import Endereco, Loja, Produto, RenamableImageModel
 from .forms import LojistaLoginForm, LojistaForm
+from .decorators import lojista_required
 
 
+@lojista_required
 def index(request):
     produtos = Produto.objects.filter(loja__lojista=request.user)
     return render(request, 'empresarial/index.html', {
@@ -43,6 +45,7 @@ class LojistaLoginView(View):
         })
     
 
+@lojista_required
 class LojistaLogoutView(View):
     def get(self, request):
         logout(request)
@@ -193,6 +196,7 @@ def concluir_cadastro(request):
     })
 
 
+@lojista_required
 def pagina_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
 
@@ -204,6 +208,7 @@ def pagina_produto(request, id_produto):
         raise PermissionDenied
 
 
+@lojista_required
 def cadastrar_produto(request):
     if request.method == "POST":
         form = ProdutoForm(request.POST, request.FILES)
@@ -222,6 +227,7 @@ def cadastrar_produto(request):
     return render(request, 'empresarial/cadastrar_produto.html', {'form': form})
 
 
+@lojista_required
 def editar_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
     
@@ -241,6 +247,7 @@ def editar_produto(request, id_produto):
         raise PermissionDenied
 
 
+@lojista_required
 def deletar_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
 
