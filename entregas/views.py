@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
+from django.core.exceptions import PermissionDenied
 from .forms import MotoristaLoginForm, MotoristaRegisterForm
 from .decorators import motorista_required
 
@@ -37,8 +38,13 @@ class MotoristaLoginView(View):
 
 
 class MotoristaLogoutView(View):
-    @motorista_required
     def dispatch(self, request, *args, **kwargs):
+        # Verifique se o usuário está autenticado e se é um motorista
+        if not request.user.is_authenticated or not request.user.is_motorista:
+            raise PermissionDenied  # Retorna erro 403 se não for um motorista
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
         logout(request)
         return redirect("entregas:motorista_login")
     

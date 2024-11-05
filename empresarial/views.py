@@ -7,7 +7,7 @@ from django.views import View
 from django.db import IntegrityError
 from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, CadastroForm, ProdutoForm
 from .models import Lojista, Plano
-from ecommerce.models import Endereco, Loja, Produto, RenamableImageModel
+from ecommerce.models import Endereco, Loja, Produto
 from .forms import LojistaLoginForm, LojistaForm
 from .decorators import lojista_required
 
@@ -44,9 +44,16 @@ class LojistaLoginView(View):
             "form": form,
             "error": "Usuário e/ou senha inválidos"
         })
-    
+
+
 
 class LojistaLogoutView(View):
+    def dispatch(self, request, *args, **kwargs):
+        # Verifique se o usuário está autenticado e se é um lojista
+        if not request.user.is_authenticated or not request.user.is_lojista:
+            raise PermissionDenied  # Retorna erro 403 se não for um lojista
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         logout(request)
         return redirect("empresarial:lojista_login")
