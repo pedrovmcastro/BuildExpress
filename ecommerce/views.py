@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from django.db.models import Avg
 from django.urls import reverse
 from django.views import View
+from django.core.exceptions import PermissionDenied
 
 from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao
 from . import forms
@@ -43,8 +44,13 @@ class UsuarioComumLoginView(View):
 
 
 class UsuarioComumLogoutView(View):
-    @usuario_comum_required
     def dispatch(self, request, *args, **kwargs):
+        # Verifique se o usuário está autenticado e se é apenas um usuário comum
+        if not request.user.is_authenticated or request.user.is_motorista or request.user.is_lojista:
+            raise PermissionDenied  # Retorna erro 403 se não for um usuário comum
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
         logout(request)
         return redirect("ecommerce:login")
 
