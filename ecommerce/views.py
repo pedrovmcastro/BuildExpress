@@ -9,6 +9,7 @@ from django.views import View
 
 from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao
 from . import forms
+from .decorators import usuario_comum_required
 
 
 def index(request):
@@ -41,6 +42,7 @@ class UsuarioComumLoginView(View):
         })
 
 
+@usuario_comum_required
 class UsuarioComumLogoutView(View):
     def get(self, request):
         logout(request)
@@ -159,7 +161,7 @@ def detalhes_produto(request, id_produto):
     })
 
 
-@login_required
+@usuario_comum_required
 def wishlist(request):
     produtos = Produto.objects.filter(wishlist__user=request.user)
     return render(request, 'ecommerce/lista_de_desejos.html', {
@@ -167,7 +169,7 @@ def wishlist(request):
     })
 
 
-@login_required
+@usuario_comum_required
 def acionar_wishlist(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
     wishlist_item = Wishlist.objects.filter(user=request.user, produto=produto).first()
@@ -180,7 +182,7 @@ def acionar_wishlist(request, id_produto):
     return redirect('detalhes_produto', id_produto)
 
 
-@login_required
+@usuario_comum_required
 def fazer_avaliacao(request, id_produto):
     if request.method == "POST":
         form_avaliacao = forms.FormAvaliacao(request.POST)
@@ -206,7 +208,7 @@ def fazer_avaliacao(request, id_produto):
     })   
 
 
-@login_required
+@usuario_comum_required
 def deletar_avaliacao(request, id_produto, id_avaliacao):
     avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
     avaliacao.delete()
