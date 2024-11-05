@@ -253,9 +253,3 @@ class ProdutoForm(forms.ModelForm):
                 'class': 'form-control',
             }),
         }
-
-
-
-
-
-

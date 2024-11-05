@@ -2,16 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.views import View
 from django.db import IntegrityError
 from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, CadastroForm, ProdutoForm
 from .models import Lojista, Plano
 from ecommerce.models import Endereco, Loja, Produto, RenamableImageModel
-from django.views import View
 from .forms import LojistaLoginForm, LojistaForm
 
 
 def index(request):
-    return render(request, 'empresarial/index.html')
+    produtos = Produto.objects.filter(loja__lojista=request.user)
+    return render(request, 'empresarial/index.html', {
+        'produtos': produtos
+    })
 
 
 class LojistaLoginView(View):
@@ -189,11 +193,15 @@ def concluir_cadastro(request):
     })
 
 
-def pagina_produto(request, produto_id):
-    produto = get_object_or_404(Produto, id=produto_id)
-    return render(request, 'empresarial/pagina_produto.html', {
-        'produto': produto
-    })
+def pagina_produto(request, id_produto):
+    produto = get_object_or_404(Produto, id=id_produto)
+
+    if request.user.is_authenticated and produto.loja.lojista == request.user:
+        return render(request, 'empresarial/pagina_produto.html', {
+            'produto': produto
+        })
+    else:
+        raise PermissionDenied
 
 
 def cadastrar_produto(request):
@@ -208,10 +216,37 @@ def cadastrar_produto(request):
             except IntegrityError as e:
                 return render(request, 'empresarial/cadastrar_produto.html', {'error': str(e)})
 
-            return redirect('empresarial:pagina_produto', produto_id=produto.id)
+            return redirect('empresarial:pagina_produto', id_produto=produto.id)
 
     form = ProdutoForm()
     return render(request, 'empresarial/cadastrar_produto.html', {'form': form})
 
 
+def editar_produto(request, id_produto):
+    produto = get_object_or_404(Produto, id=id_produto)
+    
+    if request.user.is_authenticated and produto.loja.lojista == request.user:
+        if request.method == 'POST':
+            form = ProdutoForm(request.POST, request.FILES, instance=produto)
+            if form.is_valid():
+                form.save()
+                return redirect("empresarial:pagina_produto", id_produto=produto.id)
 
+        form = ProdutoForm(instance=produto)
+        
+        return render(request, 'empresarial/editar_produto.html', {
+            'form': form
+        })
+    else:
+        raise PermissionDenied
+
+
+def deletar_produto(request, id_produto):
+    produto = get_object_or_404(Produto, id=id_produto)
+
+    if request.user.is_authenticated and produto.loja.lojista == request.user:
+        produto.delete()
+        return redirect("empresarial:index")
+    else:
+        raise PermissionDenied
+    

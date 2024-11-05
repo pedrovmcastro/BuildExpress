@@ -1,0 +1,17 @@
+{% extends "empresarial/layout.html" %}
+
+{% block body %}
+  <div class="container mt-5">
+    <h2>Editar Produto</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      
+      <!-- Botões de ação -->
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{% url 'empresarial:index' %}" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock body %}
