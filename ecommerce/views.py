@@ -42,11 +42,14 @@ class UsuarioComumLoginView(View):
         })
 
 
-@usuario_comum_required
-class UsuarioComumLogoutView(View):
-    def get(self, request):
-        logout(request)
-        return redirect("ecommerce:login")
+    class UsuarioComumLogoutView(View):
+        @usuario_comum_required
+        def dispatch(self, *args, **kwargs):
+            return super().dispatch(*args, **kwargs)
+    
+        def get(self, request):
+            logout(request)
+            return redirect("ecommerce:login")
 
 
 def register(request):

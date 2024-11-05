@@ -36,8 +36,11 @@ class MotoristaLoginView(View):
         })
 
 
-@motorista_required
 class MotoristaLogoutView(View):
+    @motorista_required
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    
     def get(self, request):
         logout(request)
         return redirect("entregas:motorista_login")

@@ -45,8 +45,11 @@ class LojistaLoginView(View):
         })
     
 
-@lojista_required
 class LojistaLogoutView(View):
+    @lojista_required
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    
     def get(self, request):
         logout(request)
         return redirect("empresarial:lojista_login")
