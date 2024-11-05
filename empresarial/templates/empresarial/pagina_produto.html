@@ -1,0 +1,10 @@
+{% extends "empresarial/layout.html" %}
+
+{% block title %}Página do Produto{% endblock title %}
+
+{% block body %}
+    <h2>{{ produto }}</h2>
+    <p>{{ produto.descricao }}</p>
+    <p>{{ produto.preco }}</p>
+
+{% endblock body %}

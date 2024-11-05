@@ -1,5 +1,5 @@
 from django import forms
-from ecommerce.models import Endereco
+from ecommerce.models import Endereco, Produto
 import re
 
 
@@ -215,3 +215,47 @@ class CadastroForm(forms.Form):
         session['responsavel'] = self.cleaned_data['responsavel']
         session['loja'] = self.cleaned_data['loja']
         session['plano'] = self.cleaned_data['plano']
+
+
+class ProdutoForm(forms.ModelForm):
+    class Meta:
+        model = Produto
+        fields = ['nome', 'descricao', 'preco', 'peso', 'photo']
+
+        labels = {
+            'nome': 'Nome',
+            'descricao': 'Descrição',
+            'preco': 'Preço',
+            'peso': 'Peso',
+            'photo': 'Imagem',
+        }
+
+        widgets = {
+            'nome': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome do Produto'
+            }),
+            'descricao': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Descreva em algumas linhas o seu produto',
+                'rows': 4,  # Define o número de linhas visíveis
+                'style': 'resize: none;' # Impede o redimensionamento
+            }),
+            'preco': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Preço em R$'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Peso em Kg'
+            }),
+            'photo': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+            }),
+        }
+
+
+
+
+
+
