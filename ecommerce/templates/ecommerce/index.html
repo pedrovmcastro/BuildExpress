@@ -19,11 +19,14 @@
                                     <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
                                     <h5 class="card-title"><strong>{{ produto }}</strong></h5>
                                     <p><strong>${{ produto.preco }}</strong></p>
-                                    <p>{{ produto.descricao }}</p>
+                                    <p>
+                                        {{ produto.descricao|slice:250 }}
+                                        {% if produto.descricao|length > 250 %}...{% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        <div class="card mt-2">
+                        <div class="card mt-2" id="card-logo-loja">
                             <div class="card-body text-center">
                                 <a href="{% url 'ecommerce:produtos_loja' produto.loja.id %}">
                                     {% if produto.loja.logo %}
