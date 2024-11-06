@@ -81,3 +81,17 @@ label {
     font-size: 0.9em; /* Tamanho da fonte para a descrição */
     color: gray; /* Cor cinza */
 }
+
+/* Estilos dos botões */
+#btn-emp-edit, #btn-emp-del {
+    min-width: 50px; /* Largura mínima para manter a consistência */
+    font-size: 0.5rem; /* Tamanho do texto menor */
+}
+
+#btn-emp-edit:hover {
+    background-color: #e0a800; /* Hover para o botão de edição */
+}
+
+#btn-emp-del:hover {
+    background-color: #c82333; /* Hover para o botão de exclusão */
+}
