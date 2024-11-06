@@ -18,7 +18,7 @@ def index(request):
         return render(request, 'empresarial/index.html', {
             'produtos': produtos
         })
-    render(redirect("empresarial:cadastro_inicial"))
+    return redirect("empresarial:cadastro_inicial")
 
 
 class LojistaLoginView(View):
@@ -44,7 +44,6 @@ class LojistaLoginView(View):
             "form": form,
             "error": "Usuário e/ou senha inválidos"
         })
-
 
 
 class LojistaLogoutView(View):
@@ -262,6 +261,5 @@ def deletar_produto(request, id_produto):
         produto.delete()
         return redirect("empresarial:index")
     else:
-        print("else")
         raise PermissionDenied
     
