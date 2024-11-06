@@ -20,7 +20,10 @@
                                         <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
                                         <h5 class="card-title"><strong>{{ produto }}</strong></h5>
                                         <p><strong>R$ {{ produto.preco }}</strong></p>
-                                        <p>{{ produto.descricao }}</p>
+                                        <p>
+                                            {{ produto.descricao|slice:250 }}
+                                            {% if produto.descricao|length > 250 %}...{% endif %}
+                                        </p>
                                     </div>
                                 </div>
                             </div>

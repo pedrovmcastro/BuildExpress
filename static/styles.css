@@ -95,3 +95,7 @@ label {
 #btn-emp-del:hover {
     background-color: #c82333; /* Hover para o botão de exclusão */
 }
+
+#card-logo-loja {
+    background-color: rgb(240, 238, 238);
+}

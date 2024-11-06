@@ -1,5 +1,5 @@
 from django import forms
-from ecommerce.models import Endereco, Produto
+from ecommerce.models import Endereco, Produto, Categoria
 import re
 
 
@@ -220,7 +220,7 @@ class CadastroForm(forms.Form):
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['nome', 'descricao', 'preco', 'peso', 'photo']
+        fields = ['nome', 'descricao', 'preco', 'peso', 'photo', 'categoria']
 
         labels = {
             'nome': 'Nome',
@@ -228,6 +228,7 @@ class ProdutoForm(forms.ModelForm):
             'preco': 'Preço',
             'peso': 'Peso',
             'photo': 'Imagem',
+            'categoria': 'Categoria'
         }
 
         widgets = {
@@ -252,4 +253,8 @@ class ProdutoForm(forms.ModelForm):
             'photo': forms.ClearableFileInput(attrs={
                 'class': 'form-control',
             }),
+            'categoria': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Categoria do produto'
+            })
         }
