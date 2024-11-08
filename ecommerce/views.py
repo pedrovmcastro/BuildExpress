@@ -3,13 +3,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.db import IntegrityError
-from django.db.models import Avg
+from django.db.models import Avg, F
 from django.urls import reverse
 from django.views import View
 from django.core.exceptions import PermissionDenied
 
-from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao
+from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItensCarrinho
 from . import forms
+from . import utils
 from .decorators import usuario_comum_required
 
 
@@ -185,7 +186,7 @@ def acionar_wishlist(request, id_produto):
     else:
         Wishlist.objects.create(user=request.user, produto=produto)
     
-    return redirect('detalhes_produto', id_produto)
+    return redirect('ecommerce:detalhes_produto', id_produto)
 
 
 @usuario_comum_required
@@ -225,4 +226,60 @@ def deletar_avaliacao(request, id_produto, id_avaliacao):
     produto.avaliacoes -= 1
     produto.save()
     return redirect('detalhes_produto', id_produto)
+
+
+@usuario_comum_required
+def carrinho(request):
+    carrinho = Carrinho.objects.filter(user=request.user, is_active=True).first()
+
+    if carrinho:
+        itens = ItensCarrinho.objects.filter(carrinho=carrinho)
+    else:
+        carrinho = Carrinho.objects.create(user=request.user)
+        itens = []
+
+    total = sum(item.calcular_total() for item in itens)
+
+    return render(request, 'ecommerce/carrinho.html', {
+        'itens': itens,
+        'carrinho': carrinho,
+        'total': total
+    })
+
+
+def acionar_carrinho(request, id_produto):
+    produto = get_object_or_404(Produto, id=id_produto)
+    carrinho, _ = Carrinho.objects.get_or_create(user=request.user, is_active=True)
+    item_carrinho = ItensCarrinho.objects.filter(carrinho=carrinho, produto=produto).first()
+
+    return carrinho, item_carrinho
+
+
+@usuario_comum_required
+def adicionar_ao_carrinho(request, id_produto):
+    produto = get_object_or_404(Produto, id=id_produto)
+    carrinho, item_carrinho = acionar_carrinho(request, id_produto)
+    
+    if item_carrinho:
+        item_carrinho.quantidade = F('quantidade') + 1
+        item_carrinho.save()
+        item_carrinho.refresh_from_db()
+    else:
+        ItensCarrinho.objects.create(carrinho=carrinho, produto=produto, quantidade=1, preco_unitario=produto.preco)
+
+    return redirect('ecommerce:carrinho')
+
+
+@usuario_comum_required
+def remover_do_carrinho(request, id_produto):
+    _, item_carrinho = acionar_carrinho(request, id_produto)
+
+    if item_carrinho.quantidade == 1:
+        item_carrinho.delete()
+    else:
+        item_carrinho.quantidade = F('quantidade') - 1
+        item_carrinho.save()
+        item_carrinho.refresh_from_db()
+
+    return redirect('ecommerce:carrinho')
 
