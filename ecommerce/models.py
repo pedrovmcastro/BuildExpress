@@ -106,6 +106,7 @@ class Endereco(models.Model):
         return f"{self.logradouro}, {self.numero}, {self.bairro}, {self.cidade} - {self.cep}"
     
 
+
 class Loja(RenamableImageModel):
     nome = models.CharField(max_length=100)
     nome_responsavel = models.CharField(max_length=100, default=None)
@@ -117,6 +118,7 @@ class Loja(RenamableImageModel):
     endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
     lojista = models.ForeignKey('empresarial.lojista', on_delete=models.SET_NULL, default=None, null=True)
     logo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
+    pedido_minimo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=None)
 
     image_field_name = 'logo'
 
