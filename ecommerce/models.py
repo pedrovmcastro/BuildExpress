@@ -173,3 +173,28 @@ class Avaliacao(models.Model):
     def __str__(self):
         return f"{self.user} avaliou o produto {self.produto} às {self.datetime_submited}"
     
+
+class Carrinho(models.Model):
+    user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[('em andamento', 'Em Andamento'), ('finalizado', 'Finalizado'), ('abandonado', 'Abandonado')], default='em andamento')
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Carrinho de {self.user} - {self.datetime}"
+    
+
+class ItensCarrinho(models.Model):
+    carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantidade = models.IntegerField()
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.produto
+
+    def calcular_total(self):
+        return self.quantidade * self.preco_unitario
+    
+
+    
