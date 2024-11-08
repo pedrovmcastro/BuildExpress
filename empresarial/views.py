@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views import View
 from django.db import IntegrityError
-from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, CadastroForm, ProdutoForm
+from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, ProdutoForm, MinhaLojaForm, NewLogoForm, EditLogoForm
 from .models import Lojista, Plano
 from ecommerce.models import Endereco, Loja, Produto
 from .forms import LojistaLoginForm, LojistaForm
@@ -262,4 +262,44 @@ def deletar_produto(request, id_produto):
         return redirect("empresarial:index")
     else:
         raise PermissionDenied
+
+@lojista_required
+def configurar_loja(request):
+    loja = get_object_or_404(Loja, lojista=request.user)
+
+    initial_data = {
+        'nome_loja': loja.nome,
+        'telefone_loja': loja.telefone,
+        'pedido_minimo': loja.pedido_minimo
+    }
+
+    if request.method == 'POST':
+        form = MinhaLojaForm(request.POST)
+        new_logo_form = NewLogoForm(request.POST, request.FILES, instance=loja)
+        edit_logo_form = EditLogoForm(request.POST, request.FILES, instance=loja)
+
+        if form.is_valid():
+            loja.nome = form.cleaned_data['nome_loja']
+            loja.telefone = form.cleaned_data['telefone_loja']
+            loja.pedido_minimo = form.cleaned_data['pedido_minimo']
+            loja.save()
+        
+        if new_logo_form.is_valid():
+            new_logo_form.save()
+
+        if edit_logo_form.is_valid():
+            edit_logo_form.save()
+
+        return redirect('empresarial:loja')
+
+    form = MinhaLojaForm(initial=initial_data)
+    new_logo_form = NewLogoForm(instance=loja)
+    edit_logo_form = EditLogoForm(instance=loja)
     
+    return render(request, 'empresarial/perfil_loja.html', {
+        'form': form,
+        'new_logo_form': new_logo_form,
+        'edit_logo_form': edit_logo_form,
+        'loja': loja
+    })
+

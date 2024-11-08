@@ -1,0 +1,77 @@
+{% extends "empresarial/layout.html" %}
+
+{% load static %}
+
+{% block title %}Perfil da Loja{% endblock title %}
+
+{% block head %}
+    <script src="{% static 'perfil_loja.js' %}"></script>
+{% endblock head %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row">
+
+            <!--Coluna esquerda-->
+            <div class="col-12 col-md-2">
+                <div id="left-div-perfil-loja" class="border p-3">
+                    <h5>Loja fechada<br>Em configuração</h5>
+                    <h5 class="m-3">Configurações</h5>
+                    <p>Horário de funcionamento</p>
+                    <p>Minha Loja</p>
+                </div>
+            </div>
+
+            <!--Coluna direita-->
+            <div class="col-12 col-md-10">
+                <div id="right-div-perfil-loja" class="border p-3">
+                    <div class="text-center mb-4">
+                        <div class="m-2 d-flex flex-column justify-content-center align-items-center">
+                            {% if loja.logo %}
+
+                                <div class="logo-container position-relative">
+                                    <img id="img-logo-perfil" src="{{ loja.logo.url }}" alt="Logo da loja" class="img-fluid rounded-circle" width="180px" height="180px">
+                                    <form method="post" enctype="multipart/form-data" id="edit-logo-form" class="text-center">
+                                        {% csrf_token %}
+                                        {{ edit_logo_form.logo }}
+                                        <input type="file" name="logo" id="ed-logo">
+                                        <span id="mudar-logo-span" class="d-flex justify-content-center align-items-center position-absolute bottom-0 w-100 p-2">
+                                            <span class="text-bg">Mudar logo</span>
+                                        </span>
+                                        <button id="editar-logo-btn" type="submit" class="btn btn-secondary mt-2">Salvar</button>
+                                    </form>
+                                </div>
+
+                            {% else %}
+
+                                <form method="post" enctype="multipart/form-data" id="new-logo-form">
+                                    {% csrf_token %}
+                                    {{ new_logo_form.logo }}
+                                    <!--Circulo cinza acima do título (input escondido)-->
+                                    <div id="logo-circle" class="rounded-circle d-flex justify-content-center align-items-center">                                    
+                                        <input type="file" name="logo" id="id_logo">
+                                        <span id="logo-circle-content" class="d-flex justify-content-center align-items-center rounded-circle text-muted">Adicionar logo</span>
+                                    </div>
+                                    <button id="salvar-logo-btn" type="submit" class="btn btn-secondary">Salvar</button>
+                                </form>
+                               
+                            {% endif %}
+                        </div>
+
+                        <h2 class="mt-10">{{ loja }}</h2>
+
+                        <!--Form com informações sobrea a loja -->
+                        <form method="post" class="mt-10">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary mt-3">Salvar Configurações</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>           
+
+{% endblock body %}

@@ -1,5 +1,5 @@
 from django import forms
-from ecommerce.models import Endereco, Produto, Categoria
+from ecommerce.models import Endereco, Produto, Categoria, Loja
 import re
 
 
@@ -257,4 +257,56 @@ class ProdutoForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Categoria do produto'
             })
+        }
+
+
+class MinhaLojaForm(forms.Form):
+    nome_loja = forms.CharField(
+        label="Nome da loja (como aparecerá no app)",
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome do seu negócio'
+            }
+        )
+    )
+    telefone_loja = forms.CharField(
+        label="Telefone ou celular da loja (como aparecerá no app)",
+        max_length=15,  # Definindo o tamanho para seguir o formato (XX) XXXXX-XXXX
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': '(00) 00000-0000'
+            }
+        )
+    )
+    pedido_minimo = forms.DecimalField(
+        label="Pedido mínimo",
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: 50.00'
+            }
+        )
+    )
+
+
+class NewLogoForm(forms.ModelForm):
+    class Meta:
+        model = Loja
+        fields = ['logo']
+        widgets = {
+            'logo': forms.FileInput(attrs={'id': 'id_logo'})  # Define o ID explicitamente
+        }
+
+
+class EditLogoForm(forms.ModelForm):
+    class Meta:
+        model = Loja
+        fields = ['logo']
+        widgets = {
+            'logo': forms.FileInput(attrs={'id': 'ed-logo'})
         }

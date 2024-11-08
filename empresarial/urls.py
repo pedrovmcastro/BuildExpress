@@ -20,7 +20,8 @@ urlpatterns = [
     path("cadastro_produto", views.cadastrar_produto, name="cadastrar_produto"),
     path("produto/<int:id_produto>", views.pagina_produto, name="pagina_produto"),
     path("produto/<int:id_produto>/editar", views.editar_produto, name="editar_produto"),
-    path("produto/<int:id_produto>/deletar", views.deletar_produto, name="deletar_produto")
+    path("produto/<int:id_produto>/deletar", views.deletar_produto, name="deletar_produto"),
+    path("loja", views.configurar_loja, name="loja"),
 ]
 
 if settings.DEBUG:
