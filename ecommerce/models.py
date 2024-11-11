@@ -194,13 +194,13 @@ class Carrinho(models.Model):
         return f"Carrinho de {self.user} - {self.datetime}"
     
     def total_carrinho(self):
-        return sum(item.calcular_total() * item.quantidade for item in self.itemcarrinho_set.all())
+        return sum(item.calcular_total() for item in self.itemcarrinho_set.all())
     
     def peso_carrinho(self):
-        return sum(item.calcular_peso() * item.quantidade for item in self.itemcarrinho_set.all())
+        return sum(item.calcular_peso() for item in self.itemcarrinho_set.all())
     
     def volume_carrinho(self):
-        return sum(item.calcular_volume() * item.quantidade for item in self.itemcarrinho_set.all())
+        return sum(item.calcular_volume() for item in self.itemcarrinho_set.all())
     
 
 class ItemCarrinho(models.Model):
