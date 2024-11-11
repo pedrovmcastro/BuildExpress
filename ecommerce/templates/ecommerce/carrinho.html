@@ -54,7 +54,18 @@
                     </a>
                 </div>
             {% endfor %}
-            <h3>Total: R$ {{ total }}</h3>
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h3 class="m-0">Total: R$ {{ total }}</h3>
+                <div class="carrinho-butons">
+                    <form method="post" class="d-inline">
+                        <button type="submit" class="btn btn-success">Finalizar pedido</button>
+                    </form>
+                    <form method="post" class="d-inline" action="{% url 'ecommerce:abandonar_carrinho' id_carrinho=carrinho.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancelar</button>
+                    </form>
+                </div>
+            </div>
         </div>
     {% else %}
         <p>O carrinho está vazio.</p>

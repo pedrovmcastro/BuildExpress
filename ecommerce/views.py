@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.views import View
 from django.core.exceptions import PermissionDenied
 
+from datetime import datetime, timedelta
+
 from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho
 from . import forms
 from . import utils
@@ -303,4 +305,13 @@ def remover_do_carrinho(request, id_produto):
         item_carrinho.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@usuario_comum_required
+def abandonar_carrinho(request, id_carrinho):
+    carrinho = get_object_or_404(Carrinho, id=id_carrinho)
+    carrinho.status = "abandonado"
+    carrinho.is_active = False
+    carrinho.save()
+    return redirect('ecommerce:index')
 

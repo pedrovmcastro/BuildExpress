@@ -22,7 +22,8 @@ urlpatterns = [
     path("produto/<int:id_produto>/<int:id_avaliacao>/deletar", views.deletar_avaliacao, name="deletar_avaliacao"),
     path('carrinho', views.carrinho, name="carrinho"),
     path("carrinho/<int:id_produto>/adicionar", views.adicionar_ao_carrinho, name="adicionar_ao_carrinho"),
-    path("carrinho/<int:id_produto>/remover", views.remover_do_carrinho, name="remover_do_carrinho")
+    path("carrinho/<int:id_produto>/remover", views.remover_do_carrinho, name="remover_do_carrinho"),
+    path("carrinho/<int:id_carrinho>/abandonar", views.abandonar_carrinho, name="abandonar_carrinho")
 ]
 
 if settings.DEBUG:
