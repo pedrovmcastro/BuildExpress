@@ -2,16 +2,16 @@
 
 {% block body %}
 
-    <h2>Carrinho</h2>
+    <h2 class="mb-4">Carrinho</h2>
 
     {% if itens %}
         <div class="row">
             {% for item in itens %}
-                <a href="{% url 'ecommerce:detalhes_produto' item.produto.id %}" class="text-decoration-none text-dark">
-                    <div class="col-12 mb-4">
+                <div class="item-carrinho col-6 mb-4">
+                    <a href="{% url 'ecommerce:detalhes_produto' item.produto.id %}" class="text-decoration-none text-dark">
                         <div class="card h-100">
                             <div class="row no-gutters">
-                                <div class="col-lg-2 col-md-4">
+                                <div class="col-lg-4 col-md-5">
                                     {% if item.produto.photo %}
                                         <img src="{{ item.produto.photo.url }}" alt="{{ item.produto }}" width="100%" height="200px">
                                     {% endif %}
@@ -39,12 +39,18 @@
                                             </form>
                                         </p>
                                         <p><strong>Quantidade: {{ item.quantidade }}</strong></p>
+
+                                        <div class="erro">
+                                            {% for message in messages %}
+                                                <p class="alert alert-danger">{{ message }}</p>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
             {% endfor %}
             <h3>Total: R$ {{ total }}</h3>
         </div>

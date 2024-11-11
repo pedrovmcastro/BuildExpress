@@ -208,7 +208,8 @@ def pagina_produto(request, id_produto):
 
     if request.user.is_authenticated and produto.loja.lojista == request.user:
         return render(request, 'empresarial/pagina_produto.html', {
-            'produto': produto
+            'produto': produto,
+            'volume': round(produto.volume_em_metros_cubicos()*1000000, 2),
         })
     else:
         raise PermissionDenied
@@ -262,6 +263,7 @@ def deletar_produto(request, id_produto):
         return redirect("empresarial:index")
     else:
         raise PermissionDenied
+
 
 @lojista_required
 def configurar_loja(request):

@@ -24,8 +24,8 @@ label {
     margin: 10px;
 }
 
-.top-nav {
-    background-color: #ff6600;
+.top-nav{
+    background-color: #ec4c2c;
     padding: 10px;
 }
 
@@ -46,6 +46,17 @@ label {
 
 .nav {
     justify-content: center;
+}
+
+
+/* PAGINA PRODUTO */
+/* Estilos para a tabela (header) */
+.header-table th {
+    background-color: #ec4c2c;
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
 }
 
 

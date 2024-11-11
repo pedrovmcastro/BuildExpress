@@ -220,15 +220,19 @@ class CadastroForm(forms.Form):
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['nome', 'descricao', 'preco', 'peso', 'photo', 'categoria']
+        fields = ['nome', 'descricao', 'preco', 'peso', 'comprimento', 'largura', 'altura', 'photo', 'categoria', 'estoque']
 
         labels = {
             'nome': 'Nome',
             'descricao': 'Descrição',
             'preco': 'Preço',
             'peso': 'Peso',
+            'comprimento': 'Comprimento',
+            'largura': 'Largura',
+            'altura': 'Altura',
             'photo': 'Imagem',
-            'categoria': 'Categoria'
+            'categoria': 'Categoria',
+            'estoque': 'Estoque',
         }
 
         widgets = {
@@ -250,12 +254,28 @@ class ProdutoForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Peso em Kg'
             }),
+            'comprimento': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Comprimento em cm'
+            }),
+            'largura': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Largura em cm'
+            }),
+            'altura': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Altura em cm'
+            }),
             'photo': forms.ClearableFileInput(attrs={
                 'class': 'form-control',
             }),
             'categoria': forms.Select(attrs={
                 'class': 'form-control',
                 'placeholder': 'Categoria do produto'
+            }),
+            'estoque': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Quantidade em estoque'
             })
         }
 
