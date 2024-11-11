@@ -32,6 +32,12 @@
             <input type="submit" value="Adicionar ao carrinho" class="btn btn-success"> 
         </form>
 
+        <div class="erro mt-3">
+            {% for message in messages %}
+                <p class="alert alert-danger">{{ message }}</p>
+            {% endfor %}
+        </div>
+
     {% endif %}
     
     <!--Detalhes do Produto -->
@@ -39,6 +45,7 @@
         <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="auto" height="400px">
         <p>{{ produto.descricao }}</p>
         <h2>R$ {{ produto.preco }}</h2>
+        <p><strong>Quantidade em estoque: {{ produto.estoque }}</strong></p>
     </div>
     
     <div class="mt-4">
@@ -58,6 +65,39 @@
         {% else %}
             <p>Sem categoria</p>
         {% endif %}
+    </div>
+
+    <!-- Dimensões -->
+    <div class="mt-5 mb-5 text-center">
+        <table class="table table-bordered">
+            <thead class="header-table">
+                <tr>
+                    <th colspan="2">Dimensões do Produto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Peso:</strong></td>
+                    <td>{{ produto.peso }} Kg</td>
+                </tr>
+                <tr>
+                    <td><strong>Comprimento:</strong></td>
+                    <td>{{ produto.comprimento }} cm</td>
+                </tr>
+                <tr>
+                    <td><strong>Largura:</strong></td>
+                    <td>{{ produto.largura }} cm</td>
+                </tr>
+                <tr>
+                    <td><strong>Altura:</strong></td>
+                    <td>{{ produto.altura }} cm</td>
+                </tr>
+                <tr>
+                    <td><strong>Volume:</strong></td>
+                    <td>{{ volume }} cm³</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!--Avaliacoes de usuarios-->

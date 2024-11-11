@@ -280,13 +280,13 @@ def adicionar_ao_carrinho(request, id_produto):
             item_carrinho.quantidade += 1
             item_carrinho.save()
         else:
-            messages.error(request, "Estoque insuficiente para adicionar mais unidades.")
+            messages.error(request, "Estoque insuficiente para adicionar mais unidades.", extra_tags=f"{id_produto}") # Aqui tomar cuidado, que o django adiciona automaticamente a tag "error"; ex: se o id fosse '16' a tag seria '16 error'
     else:
         # Verifica se há algum produto no estoque para assim poder criar o item
         if produto.estoque > 0:
             item_carrinho = ItemCarrinho.objects.create(carrinho=carrinho, produto=produto, quantidade=1)
         else:
-            messages.error(request, "Produto fora de estoque.")
+            messages.error(request, "Produto fora de estoque.", extra_tags=f"{id_produto}")
 
     # Redireciona para a página onde o usuário estava antes de clicar no botão que aciona o carrinho
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

@@ -42,7 +42,9 @@
 
                                         <div class="erro">
                                             {% for message in messages %}
-                                                <p class="alert alert-danger">{{ message }}</p>
+                                                {% if item.produto.id|stringformat:"s"|add:" error" == message.tags %}
+                                                    <p class="alert alert-danger">{{ message }}</p>
+                                                {% endif %}
                                             {% endfor %}
                                         </div>
                                     </div>
