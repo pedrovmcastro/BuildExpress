@@ -76,15 +76,6 @@ class UsuarioComum(AbstractBaseUser):
 
     objects = UsuarioComumManager()
 
-    def has_perm(self, perm, obj=None):
-        return self.is_superuser
-    
-    def has_module_perms(self, app_label):
-        return self.is_superuser
-
-    def __str__(self):
-        return self.email
-    
     @property
     def is_lojista(self):
         return False
@@ -92,8 +83,17 @@ class UsuarioComum(AbstractBaseUser):
     @property
     def is_motorista(self):
         return False
-    
 
+    def __str__(self):
+        return self.email
+    
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+    
+    def has_module_perms(self, app_label):
+        return self.is_superuser
+    
+    
 class Endereco(models.Model):
     cep = models.CharField(max_length=15)
     logradouro = models.CharField(max_length=100)
@@ -140,17 +140,27 @@ class Produto(RenamableImageModel):
     nome = models.CharField(max_length=100)
     descricao = models.TextField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
-    peso = models.DecimalField(max_digits=10, decimal_places=2)
     nota = models.DecimalField(max_digits=3, decimal_places=2, default=None, null=True, blank=True)
     avaliacoes = models.IntegerField(default=0)
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, null=True, blank=True, on_delete=models.SET_NULL)
     photo = models.ImageField(upload_to=utils.rename_image, null=True, blank=True)
+    estoque = models.IntegerField(validators=[MinValueValidator(0)], default=1)
+
+    # Dimensões do produto (Kg e cm³)
+    peso = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    comprimento = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    largura = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    altura = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
     image_field_name = 'photo'
 
     def __str__(self):
         return self.nome
+    
+    def volume_em_metros_cubicos(self):
+        return (self.comprimento * self.largura * self.altura) / 1000000
+
 
 
 class Wishlist(models.Model):
@@ -183,18 +193,30 @@ class Carrinho(models.Model):
     def __str__(self):
         return f"Carrinho de {self.user} - {self.datetime}"
     
+    def total_carrinho(self):
+        return sum(item.calcular_total() * item.quantidade for item in self.itemcarrinho_set.all())
+    
+    def peso_carrinho(self):
+        return sum(item.calcular_peso() * item.quantidade for item in self.itemcarrinho_set.all())
+    
+    def volume_carrinho(self):
+        return sum(item.calcular_volume() * item.quantidade for item in self.itemcarrinho_set.all())
+    
 
-class ItensCarrinho(models.Model):
+class ItemCarrinho(models.Model):
     carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     quantidade = models.IntegerField()
-    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return self.produto
 
     def calcular_total(self):
-        return self.quantidade * self.preco_unitario
+        return self.quantidade * self.produto.preco
     
-
+    def calcular_peso(self):
+        return self.quantidade * self.produto.peso
+    
+    def calcular_volume(self):
+        return self.quantidade * self.produto.volume_em_metros_cubicos()
     
