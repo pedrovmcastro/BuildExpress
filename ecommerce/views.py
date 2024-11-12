@@ -11,7 +11,7 @@ from django.core.exceptions import PermissionDenied
 
 from datetime import datetime, timedelta
 
-from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho
+from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario
 from . import forms
 from . import utils
 from .decorators import usuario_comum_required
@@ -315,3 +315,46 @@ def abandonar_carrinho(request, id_carrinho):
     carrinho.save()
     return redirect('ecommerce:index')
 
+
+@usuario_comum_required
+def finalizar_carrinho(request, id_carrinho):
+    carrinho = get_object_or_404(Carrinho, id=id_carrinho)
+    carrinho.status = "finalizado"
+    carrinho.is_active = False
+    carrinho.save()
+
+    # CRIAR O PEDIDO, COM AS INFORMAÇÕES DO CARRINHO
+
+    return redirect('ecommerce:exibir_enderecos')
+
+
+
+# CHECKOUT
+
+
+# para garantir que só exiba os enderecos só permitir (permission denied) se tiver um carrinho na session com o id do usuario
+
+@usuario_comum_required
+def exibir_enderecos(request):
+    selecao = SelecaoEnderecoUsuario.objects.filter(user=request.user).prefetch_related('endereco') # o Django faz uma única query com um join, trazendo os dados tanto de SelecaoEnderecoUsuario quanto de Endereco em um único resultado de consulta
+    return render(request, 'ecommerce/selecao_enderecos.html', { 
+        'selecao': selecao
+    })
+
+
+@usuario_comum_required
+def adicionar_endereco(request):
+    if request.method == "POST":
+        form = forms.EnderecoForm(request.POST)
+        
+        if form.is_valid():
+            try:
+                endereco = Endereco.objects.create(**form)
+                SelecaoEnderecoUsuario.objects.create(user=request.user, endereco=endereco)
+            except IntegrityError as e:
+                return render(request, 'ecommerce/adicionar_endereco.html', {'error': str(e)})
+            
+            return redirect('ecommerce:exibir_enderecos')
+        
+    form = forms.EnderecoForm()
+    return render(request, 'ecommerce/adicionar_endereco.html', {'form': form})

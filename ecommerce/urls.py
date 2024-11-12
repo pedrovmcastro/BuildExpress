@@ -19,11 +19,15 @@ urlpatterns = [
     path("wishlist", views.wishlist, name="wishlist"),
     path("produto/<int:id_produto>/acionar_wishlist", views.acionar_wishlist, name="acionar_wishlist"),
     path("produto/<int:id_produto>/avaliacao", views.fazer_avaliacao, name="fazer_avaliacao"),
-    path("produto/<int:id_produto>/<int:id_avaliacao>/deletar", views.deletar_avaliacao, name="deletar_avaliacao"),
+    path("produto/<int:id_produto>/<int:id_avaliacao>/deletar", views.deletar_avaliacao, name="deletar_avaliacao"), # alguem poderia acessar a view pela url, ou seja deletar um item que em teoria não teria acesso
     path('carrinho', views.carrinho, name="carrinho"),
     path("carrinho/<int:id_produto>/adicionar", views.adicionar_ao_carrinho, name="adicionar_ao_carrinho"),
     path("carrinho/<int:id_produto>/remover", views.remover_do_carrinho, name="remover_do_carrinho"),
-    path("carrinho/<int:id_carrinho>/abandonar", views.abandonar_carrinho, name="abandonar_carrinho")
+    path("carrinho/<int:id_carrinho>/abandonar", views.abandonar_carrinho, name="abandonar_carrinho"),
+    path("carrinho/<int:id_carrinho>/finalizar", views.finalizar_carrinho, name="finalizar_carrinho"),
+    path("checkout/selecao-enderecos", views.exibir_enderecos, name="exibir_enderecos"),
+    path("checkout/adicionar-endereco", views.adicionar_endereco, name="adicionar_endereco"),
+
 ]
 
 if settings.DEBUG:

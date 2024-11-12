@@ -1,0 +1,18 @@
+{% extends "ecommerce/layout.html" %}
+
+{% block title %}Enderecos{% endblock title %}
+
+{% block body %}
+    <h2 class="mb-4">Selecione o endereço:</h2>
+
+    {% if selecao %}
+        {% for item in selecao %}
+            <div>{{ item.endereco }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div>
+        <a href="{% url ecommerce:adicionar_endereco %}">Adicionar endereco</a>
+    </div>
+
+{% endblock body %}

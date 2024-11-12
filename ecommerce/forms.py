@@ -1,6 +1,6 @@
 from django import forms
 
-from . models import Avaliacao
+from . models import Avaliacao, Endereco
 
 
 class BaseLoginForm(forms.Form):
@@ -37,4 +37,34 @@ class FormAvaliacao(forms.ModelForm):
             'conteudo': '',
         }
 
-        
+
+class EnderecoForm(forms.ModelForm):
+    class Meta:
+        model = Endereco
+        fields = ['cep', 'estado', 'cidade', 'bairro', 'logradouro', 'numero']
+        widgets = {
+            'cep': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '00000-000'
+            }),
+            'estado': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'UF'
+            }),
+            'cidade': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Cidade do seu negócio'
+            }),
+            'bairro': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Exemplo: Centro'
+            }),
+            'logradouro': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Exemplo: Av. Amazonas'
+            }),
+            'numero': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número da casa ou prédio'
+            }),
+        }
