@@ -106,6 +106,13 @@ class Endereco(models.Model):
         return f"{self.logradouro}, {self.numero}, {self.bairro}, {self.cidade} - {self.cep}"
     
 
+class SelecaoEnderecoUsuario(models.Model):
+    user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
+    endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} selecionou o endereço {self.endereco}"
+    
 
 class Loja(RenamableImageModel):
     nome = models.CharField(max_length=100)
