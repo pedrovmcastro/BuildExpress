@@ -258,9 +258,7 @@ def carrinho(request):
     return render(request, 'ecommerce/carrinho.html', {
         'itens': itens,
         'carrinho': carrinho,
-        'total': carrinho.total_carrinho(),
-        'peso': carrinho.peso_carrinho(),
-        'volume': carrinho.volume_carrinho(),
+        'total': carrinho.total_carrinho()
     })
 
 
@@ -323,7 +321,7 @@ def finalizar_carrinho(request, id_carrinho):
     carrinho.is_active = False
     carrinho.save()
 
-    # CRIAR O PEDIDO, COM AS INFORMAÇÕES DO CARRINHO
+    request.session['id_carrinho'] = carrinho.id
 
     return redirect('ecommerce:exibir_enderecos')
 
@@ -349,7 +347,7 @@ def adicionar_endereco(request):
         
         if form.is_valid():
             try:
-                endereco = Endereco.objects.create(**form)
+                endereco = Endereco.objects.create(**form.cleaned_data) # Para corrigir o problema, você precisa acessar os dados validados do formulário. Em vez de passar **form diretamente, você deve passar form.cleaned_data, que é o dicionário com os dados validados.
                 SelecaoEnderecoUsuario.objects.create(user=request.user, endereco=endereco)
             except IntegrityError as e:
                 return render(request, 'ecommerce/adicionar_endereco.html', {'error': str(e)})
@@ -358,3 +356,26 @@ def adicionar_endereco(request):
         
     form = forms.EnderecoForm()
     return render(request, 'ecommerce/adicionar_endereco.html', {'form': form})
+
+
+@usuario_comum_required
+def selecionar_endereco(request, id_endereco):
+    request.session['id_endereco'] = id_endereco
+    return redirect('ecommerce:confirmar_pedido')
+
+
+@usuario_comum_required
+def confirmar_pedido(request):
+    # Devemos passar algumas coisas para o template, as duas primeiras são o carrinho e o endereço que tao na session
+    carrinho = get_object_or_404(Carrinho, id=request.session['id_carrinho'])
+    endereco = get_object_or_404(Endereco, id=request.session['id_endereco'])
+    itens = ItemCarrinho.objects.filter(carrinho=carrinho)
+    
+    return render(request, 'ecommerce/confirmacao_pedido.html', {
+        'carrinho': carrinho,
+        'total': carrinho.total_carrinho(),
+        'peso': carrinho.peso_carrinho(),
+        'volume': carrinho.volume_carrinho(),
+        'endereco': endereco,
+        'itens': itens,
+    })

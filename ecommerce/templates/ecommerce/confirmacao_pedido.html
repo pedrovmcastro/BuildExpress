@@ -1,0 +1,26 @@
+{% extends "ecommerce/layout.html" %}
+
+{% load custom_filters %}
+
+{% block title %}Confirmação pedido{% endblock title %}
+
+{% block body %}
+    <h2 class="mb-4">Pedido confirmado</h2>
+
+    <div>
+        <p>Endereco de entrega: {{ endereco }}</p>
+    </div>
+
+    <div>
+        <ul>
+            {% for item in itens %}
+                <li>{{ item.quantidade }}x {{ item.produto }}: <strong>{{ item.produto.preco|mul:item.quantidade }}</strong></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+        Total: {{ total }}
+    </div>
+
+{% endblock body %}

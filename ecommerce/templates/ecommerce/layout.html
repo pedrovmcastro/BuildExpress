@@ -24,7 +24,7 @@
         <h1>BuildExpress</h1>
         <div>
             {% if user.is_authenticated and not user.is_lojista and not user.is_motorista %}
-                <p>Bem-vindo <strong>{{ user.email }}</strong>!</p>
+                <p>Bem-vindo, <strong>{{ user.nome }}</strong>!</p>
             {% endif %}
         </div>
     </header>

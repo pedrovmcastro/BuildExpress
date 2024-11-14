@@ -1,18 +1,43 @@
 {% extends "ecommerce/layout.html" %}
 
+{% load static %}
+
 {% block title %}Enderecos{% endblock title %}
 
 {% block body %}
     <h2 class="mb-4">Selecione o endereço:</h2>
 
-    {% if selecao %}
-        {% for item in selecao %}
-            <div>{{ item.endereco }}</div>
-        {% endfor %}
-    {% endif %}
+    <div class="container">
 
-    <div>
-        <a href="{% url ecommerce:adicionar_endereco %}">Adicionar endereco</a>
+        {% if selecao %}
+            <form method="post" id="form-selecionar-endereco" action="">
+                {% csrf_token %}
+                {% for item in selecao %}
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="endereco{{ item.endereco.id }}" name="endereco" value="{{ item.endereco.id }}" 
+                            onclick="atualizarAction({{ item.endereco.id }})">
+                        <label class="form-check-label" for="endereco{{ item.endereco.id }}">
+                            {{ item.endereco }}
+                        </label>
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary mt-3">Continuar</button>
+            </form>
+        {% endif %}
+
+        <div>
+            <a href="{% url 'ecommerce:adicionar_endereco' %}">Adicionar endereco</a>
+        </div>
+
     </div>
+
+    <script>
+        function atualizarAction(id_endereco) {
+            const form = document.getElementById('form-selecionar-endereco');
+            form.action = `/checkout/selecao-enderecos/${id_endereco}/selecionar`;
+            console.log("Form action atualizado para:", form.action);
+        }
+    </script>
 
 {% endblock body %}

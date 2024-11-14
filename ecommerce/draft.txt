@@ -1,0 +1,18 @@
+1 - Carrinho;
+    recupera da session
+
+2 - Endereço;
+    recupera da session
+
+3 - Formas de entrega, com os diferentes valores;
+    - Entrega pela loja ou pelo app
+    - Entrega expressa - mais cara
+    - Entrega planejada
+
+4 - Cupons de desconto;
+
+5 - Forma de pagamento;
+    - Pix
+    - Credito
+
+6 - Confirmar pedido;
