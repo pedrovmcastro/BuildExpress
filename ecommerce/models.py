@@ -227,3 +227,14 @@ class ItemCarrinho(models.Model):
     def calcular_volume(self):
         return self.quantidade * self.produto.volume_em_metros_cubicos()
     
+
+class Cupom(models.Model):
+    titulo = models.CharField(max_length=40)
+    desconto = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(0.04), MaxValueValidator(0.16)])
+
+    def __str__(self):
+        return self.titulo
+    
+    def aplicar_desconto(self, preco_original):
+        return preco_original * (1 - self.desconto)
+    
