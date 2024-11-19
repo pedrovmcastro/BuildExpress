@@ -1,6 +1,9 @@
 from django import forms
 
+from datetime import datetime
+
 from . models import Avaliacao, Endereco
+from entregas.models import Entrega, EntregaAgendada
 
 
 class BaseLoginForm(forms.Form):
@@ -68,3 +71,39 @@ class EnderecoForm(forms.ModelForm):
                 'placeholder': 'Número da casa ou prédio'
             }),
         }
+
+
+class FormaDeEntregaForm(forms.ModelForm):
+    FORMA_DE_ENTREGA_CHOICES = [
+        ('expressa', 'Entrega Expressa'),
+        ('agendada', 'Entrega Agendada'),
+    ]
+
+    forma_de_entrega = forms.ChoiceField(
+        choices=FORMA_DE_ENTREGA_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+
+    class Meta:
+        model = Entrega
+        fields = ['forma_de_entrega']
+
+
+class EntregaAgendadaForm(forms.ModelForm):
+    data = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    hora = forms.TimeField(widget=forms.TimeInput(attrs={'type':'time'}))
+
+    class Meta:
+        model = EntregaAgendada
+        fields = ['data', 'hora']
+        
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Combine os valores do form para criar o datetime
+        instance.datetime_entrega = datetime.combine(self.cleaned_data['data'], self.cleaned_data['hora'])
+
+        if commit:
+            instance.save()
+        return instance
