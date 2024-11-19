@@ -238,3 +238,24 @@ class Cupom(models.Model):
     def aplicar_desconto(self, preco_original):
         return preco_original * (1 - self.desconto)
     
+
+class Pedido(models.Model):
+    user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
+    endereco_user = models.ForeignKey(Endereco, on_delete=models.CASCADE)
+    carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    forma_pagamento = models.CharField(max_length=20, choices=[('crédito', 'Crédito'), ('pix', 'Pix')], default=None, null=True)
+    cupom = models.ForeignKey(Cupom, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+    status = models.CharField(max_length=20, 
+        choices=[('em andamento', 'Em Andamento'), 
+            ('saiu para entrega', 'Saiu para entrega'), 
+            ('finalizado', 'Finalizado'), 
+            ('abandonado', 'Abandonado'), 
+            ('cancelado', 'Cancelado'),
+            ('entregue', 'Entregue')], 
+            default='em andamento')
+    is_active = models.BooleanField(default=True)
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pedido de {self.user} em {self.datetime} totalizando R$ {self.total}"
