@@ -5,13 +5,17 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.db import IntegrityError
 from django.db.models import Avg
+from decimal import Decimal
 from django.urls import reverse
 from django.views import View
 from django.core.exceptions import PermissionDenied
 
 from datetime import datetime, timedelta
+from itertools import groupby
+from operator import attrgetter
 
-from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario
+from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario, Cupom, Pedido
+from entregas.models import Entrega, EntregaAgendada
 from . import forms
 from . import utils
 from .decorators import usuario_comum_required
@@ -318,13 +322,9 @@ def abandonar_carrinho(request, id_carrinho):
 def finalizar_carrinho(request, id_carrinho):
     carrinho = get_object_or_404(Carrinho, id=id_carrinho)
     carrinho.status = "finalizado"
-    carrinho.is_active = False
     carrinho.save()
 
-    request.session['id_carrinho'] = carrinho.id
-
     return redirect('ecommerce:exibir_enderecos')
-
 
 
 # CHECKOUT
@@ -366,16 +366,122 @@ def selecionar_endereco(request, id_endereco):
 
 @usuario_comum_required
 def confirmar_pedido(request):
-    # Devemos passar algumas coisas para o template, as duas primeiras são o carrinho e o endereço que tao na session
-    carrinho = get_object_or_404(Carrinho, id=request.session['id_carrinho'])
-    endereco = get_object_or_404(Endereco, id=request.session['id_endereco'])
-    itens = ItemCarrinho.objects.filter(carrinho=carrinho)
+    from decimal import Decimal
+
+    carrinho = Carrinho.objects.filter(user=request.user).last()
+    if not carrinho:
+    # Lidar com o caso de carrinho vazio
+        return redirect('ecommerce:carrinho')
     
+    endereco = get_object_or_404(Endereco, id=request.session['id_endereco'])
+    cupons = Cupom.objects.all()
+    
+    # Itens do carrinho agrupados por loja
+    itens = ItemCarrinho.objects.filter(carrinho=carrinho).select_related('produto__loja')
+    itens_por_loja ={
+        loja: list(items)
+        for loja, items in groupby(itens, key=lambda x: x.produto.loja)
+    }
+
+    # Criar ou atualizar o pedido
+    pedido, created = Pedido.objects.get_or_create(
+        user=request.user, carrinho=carrinho, is_active=True,
+        defaults={'endereco_user': endereco, 'total':carrinho.total_carrinho()}
+    )
+    if not created:
+        pedido.total = carrinho.total_carrinho()
+        if pedido.cupom:
+            pedido.total = pedido.cupom.aplicar_desconto(pedido.total)
+        pedido.save()
+
+    # Calcular taxas de entrega dinamicamente (c/ exemplo genérico)
+    entregas = []
+    for loja, itens in itens_por_loja.items():
+        peso_total = sum(item.calcular_peso() for item in itens)
+        volume_total = sum(item.calcular_volume() for item in itens)   # depois testar se está considerando a quantidade
+        taxa = Decimal("10.00") + Decimal(peso_total) * Decimal("0.50")   # Exemplo genérico
+        entrega = {
+            "loja": loja,
+            "itens": itens,
+            "peso": peso_total,
+            "volume": volume_total,
+            "taxa": round(taxa, 2),
+            "forma_de_entrega_form": forms.FormaDeEntregaForm(),
+            "entrega_agendada_form": forms.EntregaAgendadaForm(),
+        }
+        entregas.append(entrega)
+
     return render(request, 'ecommerce/confirmacao_pedido.html', {
-        'carrinho': carrinho,
-        'total': carrinho.total_carrinho(),
-        'peso': carrinho.peso_carrinho(),
-        'volume': carrinho.volume_carrinho(),
+        'pedido': pedido,
         'endereco': endereco,
-        'itens': itens,
+        'entregas': entregas,
+        'cupons': cupons,
+        'total': round(pedido.total, 2),
     })
+    
+
+@usuario_comum_required
+def aplicar_cupom(request):
+    id_cupom = request.POST.get('cupom')
+    cupom = get_object_or_404(Cupom, id=id_cupom)
+
+    carrinho = Carrinho.objects.filter(user=request.user).last()
+
+    pedido = Pedido.objects.filter(user=request.user, carrinho=carrinho, is_active=True).first()
+
+    # Aplica o cupom:
+    pedido.cupom = cupom
+    pedido.save()
+
+    return redirect('ecommerce:confirmar_pedido')
+
+
+@usuario_comum_required
+def forma_de_entrega(request):
+    if request.method == "POST":
+        loja_id = request.POST.get("loja_id")
+        loja = get_object_or_404(Loja, id=loja_id)
+
+        forma_form = forms.FormaDeEntregaForm(request.POST)
+        agendada_form = forms.EntregaAgendadaForm(request.POST)
+
+        if forma_form.is_valid():
+            # Recuperando a entrega associada ao pedido
+            pedido = Pedido.objects.filter(user=request.user, is_active=True).last()
+            if not pedido:
+                return redirect('ecommerce:carrinho')
+
+            entrega, created = Entrega.objects.get_or_create(
+                pedido=Pedido.objects.filter(user=request.user, is_active=True).last(),
+                endereco_loja =loja.endereco,
+                defaults={
+                    "peso": 0,
+                    "volume": 0,
+                    "forma_de_entrega": forma_form.cleaned_data["forma_de_entrega"],
+                },
+            )
+
+            entrega.forma_de_entrega = forma_form.cleaned_data["forma_de_entrega"]
+            entrega.save()
+
+            if entrega.forma_de_entrega == 'agendada' and agendada_form.is_valid():
+                agendada = agendada_form.save(commit=False)
+                agendada.pedido = pedido
+                agendada.endereco_loja = loja.endereco
+                agendada.forma_de_entrega = forma_form.cleaned_data["forma_de_entrega"]
+                agendada.save()
+
+            return redirect('ecommerce:confirmar_pedido')
+    return redirect('ecommerce:confirmar_pedido')
+
+
+@usuario_comum_required
+def entrega_agendada(request):
+    if request.method == 'POST':
+        form = forms.EntregaAgendadaForm(request.POST)
+        if form.is_valid():
+            entrega = form.save(commit=True)
+            print(entrega.datetime_entrega)
+            return redirect("ecommerce:confirmar_pedido")
+    form = forms.EntregaAgendadaForm()
+    return redirect('ecommerce:confirmar_pedido')
