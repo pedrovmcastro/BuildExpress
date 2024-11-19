@@ -207,3 +207,12 @@ label {
     cursor: pointer;
 }
 
+/* CONFIRMAÇÃO DE PEDIDO */
+
+#agendar-form {
+    display: none;
+}
+
+#forma_entrega {
+    transition: border 0.3s ease;  /* Suaviza a transição da borda vermelha */
+}

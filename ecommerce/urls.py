@@ -29,6 +29,9 @@ urlpatterns = [
     path("checkout/selecao-enderecos/<int:id_endereco>/selecionar", views.selecionar_endereco, name="selecionar_endereco"),
     path("checkout/adicionar-endereco", views.adicionar_endereco, name="adicionar_endereco"),
     path("checkout/confirmacao-pedido", views.confirmar_pedido, name="confirmar_pedido"),
+    path("checkout/confirmacao-pedido/aplicar-cupom", views.aplicar_cupom, name="aplicar_cupom"),
+    path("checkout/confirmacao-pedido/forma-entrega", views.forma_de_entrega, name="forma_de_entrega"),
+    path("checkout/confirmacao-pedido/forma-entrega/agendada", views.entrega_agendada, name="entrega_agendada"),
 
 ]
 

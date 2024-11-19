@@ -16,3 +16,20 @@
     - Credito
 
 6 - Confirmar pedido;
+
+
+<script>
+    const aplicarCupomBtn = document.querySelector('#aplicar-cupom-btn');
+
+    if (aplicarCupomBtn) {
+        aplicarCupomBtn.addEventListener('click', function() {
+            // Desativa o botão
+            aplicarCupomBtn.disabled = true;
+        })
+    }
+</script>
+
+
+
+Entregas:
+    pedido = Pedido()

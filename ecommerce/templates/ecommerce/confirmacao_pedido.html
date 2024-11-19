@@ -5,22 +5,95 @@
 {% block title %}Confirmação pedido{% endblock title %}
 
 {% block body %}
-    <h2 class="mb-4">Pedido confirmado</h2>
+    <h2 class="mb-4">Pedido</h2>
 
-    <div>
-        <p>Endereco de entrega: {{ endereco }}</p>
+    <!-- Endereço de entrega -->
+    <div class="endereco_entrega mt-5">
+        <h4>Endereco de entrega:</h4>
+        <p>{{ endereco }}</p>
     </div>
 
-    <div>
-        <ul>
-            {% for item in itens %}
-                <li>{{ item.quantidade }}x {{ item.produto }}: <strong>{{ item.produto.preco|mul:item.quantidade }}</strong></li>
-            {% endfor %}
-        </ul>
+    <!-- Entregas agrupadas por lojas -->
+    <div class="entregas mt-5">
+        {% for entrega in entregas %}
+            <div class="entrega">
+
+                <!-- Lojas e respectivos itens -->
+                <h4>Loja: {{ entrega.loja.nome }}</h4>
+                <h5>Itens:</h5>
+                <ul>
+                    {% for item in entrega.itens %}
+                        <li>{{ item.quantidade }}x {{ item.produto }}: <strong>R$ {{ item.produto.preco|mul:item.quantidade }}</strong></li>
+                    {% endfor %}
+                </ul>
+
+                <form method="post" action="{% url 'ecommerce:forma_de_entrega' %}">
+                    {% csrf_token %}
+
+                    <!-- Forma de Entrega -->
+                    <h5 class="mt-4">Selecione a forma de entrega:</h5>
+                    {{ entrega.forma_de_entrega_form.as_p }}
+
+                    <!-- Campos adicionais para entrega agendada -->
+                    <div id="agendar-form">
+                        <h5>Agendar a entrega:</h5>
+                        {{ entrega.entrega_agendada_form.as_p }}
+                    </div>
+
+                    <!-- Loja associada -->
+                    <input type="hidden" name="loja_id" value="{{ entrega.loja.id }}">
+
+                    <button type="submit" id="btn_selecionar" class="btn btn-primary">Selecionar</button>
+                </form>
+                
+            </div>
+        {% endfor %}
     </div>
 
-    <div>
-        Total: {{ total }}
+    <!-- Cupons de desconto -->
+    <div class="mt-5">
+        <h4>Cupons de desconto:</h4>
+        <form method="post" action="{% url 'ecommerce:aplicar_cupom' %}">
+            {% csrf_token %}
+            <select name="cupom">
+                {% for cupom in cupons %}
+                    <option value="{{ cupom.id }}">{{ cupom.titulo }}</option>
+                {% endfor %}
+            </select>
+            <p><button id="aplicar-cupom-btn" type="submit" class="btn btn-primary mt-3">Aplicar</button></p>
+        </form>
     </div>
+
+    <!-- Total -->
+    <div class="mt-5">
+        <h4><strong>Total:</strong> R$ {{ total }}</h4>
+    </div>
+
+    <script>
+        const formaEntrega = document.querySelector('select[name="forma_de_entrega"]');
+        const agendarForm = document.getElementById('agendar-form');
+        const btnSelecionar = document.getElementById('btn_selecionar');
+        const selectField = document.querySelector('select[name*="forma_de_entrega"]')
+
+        // Quando o botão "Selecionar" for clicado
+        if (btnSelecionar) {
+            btnSelecionar.addEventListener('click', function() {
+                // Desativa o botão e altera o texto para "Selecionado"
+                btnSelecionar.disabled = true;
+                btnSelecionar.innerText = "Selecionado";
+                btnSelecionar.style.backgroundColor = '#d3d3d3';
+
+                // Adiciona borda vermelha ao campo de seleção
+                formaEntrega.style.border = '2px solid red';
+
+                // Exibe o formulário de "Entrega Agendada" se a opção for "agendada"
+                if (formaEntrega.value === 'agendada') {
+                    agendarForm.style.display = 'block';
+                }
+            });
+        }
+
+    </script>
 
 {% endblock body %}
+

@@ -67,3 +67,4 @@ class MotoristaRegisterView(View):
             "form": form
         })
         
+
