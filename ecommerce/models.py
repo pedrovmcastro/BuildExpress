@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 from . import utils
 import os
+
 
 
 class RenamableImageModel(models.Model):
@@ -198,7 +200,9 @@ class Carrinho(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Carrinho de {self.user} - {self.datetime}"
+        local_datetime = timezone.localtime(self.datetime)
+        formatted_datetime = local_datetime.strftime("%d/%m/%Y às %H:%M")
+        return f"Carrinho de {self.user} - {formatted_datetime}"
     
     def total_carrinho(self):
         return sum(item.calcular_total() for item in self.itemcarrinho_set.all())
@@ -247,9 +251,8 @@ class Pedido(models.Model):
     forma_pagamento = models.CharField(max_length=20, choices=[('crédito', 'Crédito'), ('pix', 'Pix')], default=None, null=True)
     cupom = models.ForeignKey(Cupom, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     status = models.CharField(max_length=20, 
-        choices=[('em andamento', 'Em Andamento'), 
-            ('saiu para entrega', 'Saiu para entrega'), 
-            ('finalizado', 'Finalizado'), 
+        choices=[('em andamento', 'Em Andamento'),
+            ('confirmado', 'Confirmado'), 
             ('abandonado', 'Abandonado'), 
             ('cancelado', 'Cancelado'),
             ('entregue', 'Entregue')], 
@@ -258,4 +261,6 @@ class Pedido(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Pedido de {self.user} em {self.datetime} totalizando R$ {self.total}"
+        local_datetime = timezone.localtime(self.datetime)
+        formatted_datetime = local_datetime.strftime("%d/%m/%Y às %H:%M")
+        return f"Pedido {self.id} de {self.user} em {formatted_datetime} totalizando R$ {self.total}"

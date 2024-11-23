@@ -33,3 +33,88 @@
 
 Entregas:
     pedido = Pedido()
+
+<script>
+        const formaEntrega = document.querySelector('select[name="forma_de_entrega"]');
+        const agendarForm = document.getElementById('agendar-form');
+        const btnSelecionar = document.getElementById('btn_selecionar');
+        const selectField = document.querySelector('select[name*="forma_de_entrega"]')
+
+        // Quando o botão "Selecionar" for clicado
+        if (btnSelecionar) {
+            btnSelecionar.addEventListener('click', function() {
+                // Exibe o formulário de "Entrega Agendada" se a opção for "agendada"
+                if (formaEntrega.value === 'agendada') {
+                    agendarForm.style.display = 'block';
+                }
+            });
+        }
+
+    </script>
+
+
+
+
+
+
+    if request.method == "POST":
+        loja_id = request.POST.get("loja_id")
+        loja = get_object_or_404(Loja, id=loja_id)
+
+        # Recupera o pedido ativo do usuário
+        pedido = Pedido.objects.filter(user=request.user, is_active=True).last()
+        if not pedido:
+            return redirect('ecommerce:carrinho')
+        
+        # Instancia os forms com os dados do POST
+        forma_form = forms.FormaDeEntregaForm(request.POST)
+        agendada_form = forms.EntregaAgendadaForm(request.POST)
+
+        if forma_form.is_valid():
+            forma_de_entrega = forma_form.cleaned_data["forma_de_entrega"]
+
+            # Cria ou atualiza a entrega associada ao pedido
+            entrega, created = Entrega.objects.get_or_create(
+                pedido=pedido,
+                endereco_loja=loja.endereco, 
+            )
+            entrega.forma_de_entrega = forma_de_entrega
+            entrega.save()
+
+            # Tratamento de entrega agendada
+            if forma_de_entrega == 'agendada':
+                if agendada_form.is_valid():
+                    datetime_entrega = datetime.combine(
+                        agendada_form.cleaned_data["data"],
+                        agendada_form.cleaned_data["hora"]
+                    )
+                    # Atualiza ou cria uma entrega agendada
+                    EntregaAgendada.objects.update_or_create(
+                        pedido=pedido,
+                        defaults={
+                            "datetime_entrega": datetime_entrega,
+                            "endereco_loja": loja.endereco,
+                            "forma_de_entrega": forma_de_entrega,
+                        },
+                    )
+                else:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse(
+                            {"status": "error", "message": "Erro na validação da entrega agendada."},
+                            status=400,
+                        )
+                    return redirect('ecommerce:confirmar_pedido')
+                
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(
+                    {"status": "success"}
+                )
+
+        # Erro na validação do formulário
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(
+                {"status": "error", "message": "Erro na validação da forma de entr"},
+                status=400,
+            )
+
+    return redirect('ecommerce:confirmar_pedido')

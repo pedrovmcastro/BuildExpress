@@ -141,7 +141,7 @@ SESSION_COOKIE_NAME = 'sessionid'  # Nome do cookie da sessão
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

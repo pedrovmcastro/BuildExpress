@@ -2,7 +2,7 @@ from django import forms
 
 from datetime import datetime
 
-from . models import Avaliacao, Endereco
+from . models import Avaliacao, Endereco, Pedido
 from entregas.models import Entrega, EntregaAgendada
 
 
