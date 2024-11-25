@@ -26,13 +26,13 @@
 
     <!-- Entregas agrupadas por lojas -->
     <div class="entregas mt-5">
-        {% for entrega in entregas %}
+        {% for entrega_dict in entregas %}
             <div class="entrega">
                 <!-- Loja e itens -->
-                <h4 class="mt-5">Loja: {{ entrega.loja.nome }}</h4>
+                <h4 class="mt-5">Loja: {{ entrega_dict.loja.nome }}</h4>
                 <h5>Itens:</h5>
                 <ul>
-                    {% for item in entrega.itens %}
+                    {% for item in entrega_dict.itens %}
                         <li>{{ item.quantidade }}x {{ item.produto }}: <strong>R$ {{ item.produto.preco|mul:item.quantidade }}</strong></li>
                     {% endfor %}
                 </ul>
@@ -41,23 +41,23 @@
                 <form method="post" 
                       action="{% url 'ecommerce:forma_de_entrega' %}" 
                       class="forma-entrega-form" 
-                      data-loja-id="{{ entrega.loja.id }}">
+                      data-loja-id="{{ entrega_dict.loja.id }}">
                     {% csrf_token %}
                     <h5 class="mt-4">Selecione a forma de entrega:</h5>
-                    {{ entrega.forma_de_entrega_form.as_p }}
+                    {{ entrega_dict.forma_de_entrega_form.as_p }}
                     
                     <!-- Div para agendamento que será mostrada/escondida -->
-                    <div class="agendamento-container" style="display: none;">
+                    <div class="agendamento-container">
                         <h5 class="mt-4">Agendar a entrega:</h5>
-                        {{ entrega.entrega_agendada_form.as_p }}
+                        {{ entrega_dict.entrega_agendada_form.as_p }}
                     </div>
                     
-                    <input type="hidden" name="loja_id" value="{{ entrega.loja.id }}">
-                    <button type="submit" class="btn btn-primary">Confirmar entrega</button>
+                    <input type="hidden" name="loja_id" value="{{ entrega_dict.loja.id }}">
+                    <button name="agendar_entrega_btn" type="submit" class="btn btn-danger">Agendar entrega</button>
                 </form>
 
                  <!-- Taxa de entrega -->
-                 <h5>Taxa de entrega: R$ {{ entrega.taxa }}</h5>
+                 <h5>Taxa de entrega: R$ {{ entrega_dict.taxa }}</h5>
             </div>
         {% endfor %}
     </div>
@@ -82,6 +82,7 @@
         <form method="post" action="{% url 'ecommerce:aplicar_cupom' %}">
             {% csrf_token %}
             <select name="cupom">
+                <option value="" selected disabled>Selecione um cupom</option>
                 {% for cupom in cupons %}
                     <option value="{{ cupom.id }}">{{ cupom.titulo }}</option>
                 {% endfor %}
@@ -93,7 +94,7 @@
     <!-- Total e confirmação do pedido -->
     <div class="mt-5">
         <h4><strong>Total:</strong> R$ {{ total }}</h4>
-        <button id="confirmar-pedido-btn" type="submit" form="forma-pagamento-form" class="btn btn-primary btn-lg">
+        <button type="submit" form="forma-pagamento-form" class="btn btn-primary btn-lg">
             Confirmar pedido
         </button>
     </div>
@@ -103,37 +104,23 @@
                 e habilitá-los somente nas condições abaixo -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             const formaEntregaForms = document.querySelectorAll('.forma-entrega-form');
-            const confirmarPedidoBtn = document.querySelector('#confirmar-pedido-btn');
-
-
-            // Função para verificar se todas as formas de entrega foram selecionadas
-            const verificarFormasDeEntrega = () => {
-                let todasSelecionadas = true;
-
-                console.log("Entrou na função verificarFormasDeEntrega")
-
-                formaEntregaForms.forEach(form => {
-                    const formaEntregaSelect = form.querySelector('select[name="forma_de_entrega"]');
-                    if (!formaEntregaSelect.value) {
-                    todasSelecionadas = false;
-                    }
-                });
-
-                confirmarPedidoBtn.disabled = !todasSelecionadas; // Desabilita/Habilita o botão
-            }
-            
 
             formaEntregaForms.forEach(form => {
                 const formaEntregaSelect = form.querySelector('select[name="forma_de_entrega"]');
                 const agendamentoContainer = form.querySelector('.agendamento-container');
+                const agendamentoButton = form.querySelector('[name="agendar_entrega_btn"]');
+                
 
                 // Configuração inicial
                 const checkVisibility = () => {
                     if (formaEntregaSelect.value === 'agendada') {
                         agendamentoContainer.style.display = 'block';
+                        agendamentoButton.style.display = 'block';
                     } else {
                         agendamentoContainer.style.display = 'none';
+                        agendamentoButton.style.display = 'none';
                     }
                 };
 
@@ -143,7 +130,6 @@
                 // Evento de mudança na forma de entrega
                 formaEntregaSelect.addEventListener('change', () => {
                     checkVisibility();
-                    verificarFormasDeEntrega();
                 })
 
                 // Envio do formulário
@@ -173,7 +159,6 @@
                 });
             });
 
-            verificarFormasDeEntrega();
         });
     </script>
 {% endblock body %}

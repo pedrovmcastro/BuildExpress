@@ -387,10 +387,11 @@ def confirmar_pedido(request):
     
     # Itens do carrinho agrupados por loja
     itens = ItemCarrinho.objects.filter(carrinho=carrinho).select_related('produto__loja')
-    itens_por_loja ={    # MUDAR ISSO DAQUI ACHO 
-        loja: list(items)
-        for loja, items in groupby(itens, key=lambda x: x.produto.loja)
-    }
+    itens_por_loja = {}
+    for item in itens:
+        if item.produto.loja not in itens_por_loja:
+            itens_por_loja[item.produto.loja] = []
+        itens_por_loja[item.produto.loja].append(item)
 
     # Criar ou atualizar o pedido
     pedido, created = Pedido.objects.get_or_create(
@@ -402,8 +403,12 @@ def confirmar_pedido(request):
         if pedido.cupom:
             pedido.total = pedido.cupom.aplicar_desconto(pedido.total)
         pedido.save()
+    
+    # Primeiro, desativa todas as entregas antigas deste pedido
+    if created:
+        Entrega.objects.filter(pedido=pedido).update(is_active=False)
 
-    # Calcular taxas de entrega dinamicamente
+    # Criar ou atualizar entregas
     entregas = []
     for loja, itens in itens_por_loja.items():
         peso_total = sum(item.calcular_peso() for item in itens)
@@ -415,7 +420,45 @@ def confirmar_pedido(request):
         taxa_volume = Decimal(volume_total) * Decimal("0.30")
         taxa = taxa_base + taxa_peso + taxa_volume
 
-        entrega = {
+        try:
+            entrega = Entrega.objects.get(
+                pedido=pedido,
+                endereco_loja=loja.endereco,
+                is_active=True
+            )
+            # Atualizar valores
+            entrega.taxa_de_entrega = round(taxa, 2)
+            entrega.peso = peso_total
+            entrega.volume = volume_total
+            entrega.save()
+        except Entrega.DoesNotExist:
+            # Criar nova entrega
+            entrega = Entrega.objects.create(
+                pedido=pedido,
+                endereco_loja=loja.endereco,
+                taxa_de_entrega=round(taxa, 2),
+                peso=peso_total,
+                volume=volume_total,
+                forma_de_entrega='expressa'
+            )
+        except Entrega.MultipleObjectsReturned:
+            # Se houver múltiplas entregas ativas, desativa todas e cria uma nova
+            Entrega.objects.filter(
+                pedido=pedido,
+                endereco_loja=loja.endereco,
+                is_active=True
+            ).update(is_active=False)
+
+            entrega = Entrega.objects.create(
+                pedido=pedido,
+                endereco_loja=loja.endereco,
+                taxa_de_entrega=round(taxa, 2),
+                peso=peso_total,
+                volume=volume_total,
+                forma_de_entrega='expressa'  # valor padrão
+            )
+
+        entrega_dict = {
             "loja": loja,
             "itens": itens,
             "peso": peso_total,
@@ -423,8 +466,9 @@ def confirmar_pedido(request):
             "taxa": round(taxa, 2),
             "forma_de_entrega_form": forms.FormaDeEntregaForm(),
             "entrega_agendada_form": forms.EntregaAgendadaForm(),
+            "entrega": entrega,
         }
-        entregas.append(entrega)
+        entregas.append(entrega_dict)
 
     # Calcular total com as taxas de entrega
     total = round(pedido.total + sum(entrega['taxa'] for entrega in entregas), 2)
@@ -432,20 +476,13 @@ def confirmar_pedido(request):
     # Confirmar e finalizar pedido
     if request.method == "POST":
         # Verificar se todas as formas de entrega foram escolhidas
-        entregas = Entrega.objects.filter(pedido=pedido)
-        if not all(entrega.forma_de_entrega for entrega in entregas):
+        todas_entregas = Entrega.objects.filter(pedido=pedido)
+        if not todas_entregas.exists() or not all(entrega.forma_de_entrega for entrega in todas_entregas):
             messages.error(request, "Você deve selecionar a forma de entrega para todas as lojas.")
             return redirect('ecommerce:confirmar_pedido')
         
         # Atualizações no banco de dados:
         try:
-            # Atualizar as entregas
-            for entrega in entregas:
-                entrega.taxa_de_entrega = round(taxa, 2)
-                entrega.peso = peso_total
-                entrega.volume = volume_total
-                entrega.save()
-
             # Atualizar o pedido com a forma de pagamento, o total somado as taxas de entrega e o status
             pedido.forma_pagamento = request.POST.get('forma-pagamento')
             pedido.total = total
@@ -455,13 +492,14 @@ def confirmar_pedido(request):
             # Desativar o carrinho
             carrinho.is_active = False
             carrinho.save()
+
         except Exception as e:
             messages.error(request, f"Erro ao atualizar o pedido: {str(e)}")
             return redirect('ecommerce:confirmar_pedido')
 
         return render(request, 'ecommerce/status_pedido.html', {
             'pedido': pedido,
-            'entregas': entregas,
+            'entregas': todas_entregas,
         })
 
     return render(request, 'ecommerce/confirmacao_pedido.html', {
@@ -500,47 +538,83 @@ def forma_de_entrega(request):
         if not pedido:
             return redirect('ecommerce:carrinho')
         
+        # Recupera a entrega existente
+        try:
+            entrega = Entrega.objects.get(
+                pedido=pedido,
+                endereco_loja=loja.endereco,
+                is_active=True
+            )
+        except Entrega.DoesNotExist:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(
+                    {"status": "error", "message": "Entrega não encontrada"},
+                    status=400
+                )
+            messages.error(request, "Entrega não encontrada")
+            return redirect('ecommerce:confirmar_pedido')
+        
         # Instancia os forms com os dados do POST
-        forma_form = forms.FormaDeEntregaForm(request.POST)
-        agendada_form = forms.EntregaAgendadaForm(request.POST)
+        forma_form = forms.FormaDeEntregaForm(request.POST, instance=entrega)
 
         if forma_form.is_valid():
             forma_de_entrega = forma_form.cleaned_data["forma_de_entrega"]
+            entrega = forma_form.save(commit=False)
 
-            # Cria ou atualiza a entrega associada ao pedido
-            entrega, created = Entrega.objects.get_or_create(
-                pedido=pedido,
-                endereco_loja=loja.endereco, 
-            )
-            entrega.forma_de_entrega = forma_de_entrega
-            entrega.save()
-
-            # Tratamento de entrega agendada
+            # Se a forma de entrega for agendada, processa o formulário de agendamento
             if forma_de_entrega == 'agendada':
+                agendada_form = forms.EntregaAgendadaForm(request.POST)
                 if agendada_form.is_valid():
-                    agendamento = agendada_form.save(commit=False)
-                    agendamento.pedido = pedido
-                    agendamento.endereco_loja = loja.endereco
-                    agendamento.forma_de_entrega = forma_de_entrega
-                    agendamento.save()
+                    try:
+                        entrega_agendada = EntregaAgendada.objects.get(
+                            pedido=pedido,
+                            endereco_loja=loja.endereco,
+                            is_active=True
+                        )
+                        # Atualiza os campos da entrega agendada existente
+                        for field, value in agendada_form.cleaned_data.items():
+                            setattr(entrega_agendada, field, value)
+                    except EntregaAgendada.DoesNotExist:
+                        # Cria uma nova entrega agendada
+                        entrega_agendada = agendada_form.save(commit=False)
+                        entrega_agendada.pedido = pedido
+                        entrega_agendada.endereco_loja = loja.endereco
+                        entrega_agendada.forma_de_entrega = forma_de_entrega
+                        # Copia os campos relevantes da entrega original
+                        entrega_agendada.taxa_de_entrega = entrega.taxa_de_entrega
+                        entrega_agendada.peso = entrega.peso
+                        entrega_agendada.volume = entrega.volume
+
+                    # Desativa a entrega original
+                    entrega.is_active = False
+                    entrega.save()
+
+                    # Salva a entrega agendada
+                    entrega_agendada.save()
                 else:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse(
-                            {"status": "error", "message": "Erro na validação da entrega agendada."},
-                            status=400,
+                            {"status": "error", "message": "Erro na validação da entrega agendada"},
+                            status=400
                         )
+                    messages.error(request, "Erro na validação da entrega agendada")
                     return redirect('ecommerce:confirmar_pedido')
-                
+            else:
+                entrega.save()
+            
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse(
-                    {"status": "success"}
-                )
+                return JsonResponse({"status": "success"})
+            
+            messages.success(request, "Forma de entrega atualizada com sucesso")
+            return redirect('ecommerce:confirmar_pedido')
 
         # Erro na validação do formulário
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse(
-                {"status": "error", "message": "Erro na validação da forma de entrega."},
-                status=400,
+                {"status": "error", "message": "Erro na validação da forma de entrega"},
+                status=400
             )
-
+        messages.error(request, "Erro na validação da forma de entrega")
+        
     return redirect('ecommerce:confirmar_pedido')
+

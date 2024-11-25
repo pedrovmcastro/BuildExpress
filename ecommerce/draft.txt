@@ -118,3 +118,75 @@ Entregas:
             )
 
     return redirect('ecommerce:confirmar_pedido')
+
+
+confirmar_pedido view
+
+    itens_por_loja ={    # MUDAR ISSO DAQUI ACHO 
+        loja: list(items)
+        for loja, items in groupby(itens, key=lambda x: x.produto.loja)
+    }
+
+
+forma_de_entrega view
+    # Instancia os forms com os dados do POST
+        forma_form = forms.FormaDeEntregaForm(request.POST)
+        agendada_form = forms.EntregaAgendadaForm(request.POST)
+
+        if forma_form.is_valid():
+            forma_de_entrega = forma_form.cleaned_data["forma_de_entrega"]
+
+            # Cria ou atualiza a entrega associada ao pedido
+            entrega, created = Entrega.objects.get_or_create(
+                pedido=pedido,
+                endereco_loja=loja.endereco, 
+            )
+            entrega.forma_de_entrega = forma_de_entrega
+            entrega.save()
+
+            # Tratamento de entrega agendada
+            if forma_de_entrega == 'agendada':
+                if agendada_form.is_valid():
+                    agendamento = agendada_form.save(commit=False)
+                    agendamento.pedido = pedido
+                    agendamento.endereco_loja = loja.endereco
+                    agendamento.forma_de_entrega = forma_de_entrega
+                    agendamento.save()
+                else:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse(
+                            {"status": "error", "message": "Erro na validação da entrega agendada."},
+                            status=400,
+                        )
+                    return redirect('ecommerce:confirmar_pedido')
+                
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(
+                    {"status": "success"}
+                )
+
+        # Erro na validação do formulário
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(
+                {"status": "error", "message": "Erro na validação da forma de entrega."},
+                status=400,
+            )
+
+
+
+ // Função para verificar se todas as formas de entrega foram selecionadas
+            const verificarFormasDeEntrega = () => {
+                let todasSelecionadas = true;
+
+                console.log("Entrou na função verificarFormasDeEntrega")
+
+                formaEntregaForms.forEach(form => {
+                    const formaEntregaSelect = form.querySelector('select[name="forma_de_entrega"]');
+                    if (!formaEntregaSelect.value) {
+                    todasSelecionadas = false;
+                    }
+                });
+
+                confirmarPedidoBtn.disabled = !todasSelecionadas; // Desabilita/Habilita o botão
+            }
+            
