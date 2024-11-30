@@ -79,7 +79,7 @@
     <!-- Cupons de desconto -->
     <div class="mt-5">
         <h4>Cupons de desconto:</h4>
-        <form method="post" action="{% url 'ecommerce:aplicar_cupom' %}">
+        <form method="post" action="{% url 'ecommerce:aplicar_cupom' %}" id="cupom-form">
             {% csrf_token %}
             <select name="cupom">
                 <option value="" selected disabled>Selecione um cupom</option>
@@ -91,12 +91,18 @@
         </form>
     </div>
 
-    <!-- Total e confirmação do pedido -->
+    <!-- Total, confirmação e cancelamento do pedido -->
     <div class="mt-5">
-        <h4><strong>Total:</strong> R$ {{ total }}</h4>
-        <button type="submit" form="forma-pagamento-form" class="btn btn-primary btn-lg">
-            Confirmar pedido
-        </button>
+        <h4 id="total-pedido"><strong>Total:</strong> R$ {{ total }}</h4>
+        <div>
+            <button type="submit" form="forma-pagamento-form" class="btn btn-primary btn-lg">
+                Confirmar pedido
+            </button>
+            <form method="post" class="d-inline" action="{% url 'ecommerce:cancelar_pedido' id_pedido=pedido.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Cancelar</button>
+            </form>
+        </div>
     </div>
 
     <!-- Script JS - Desabilitar botão confirmarPedido; 
@@ -158,7 +164,6 @@
                     });
                 });
             });
-
         });
     </script>
 {% endblock body %}

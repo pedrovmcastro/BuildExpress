@@ -190,3 +190,51 @@ forma_de_entrega view
                 confirmarPedidoBtn.disabled = !todasSelecionadas; // Desabilita/Habilita o botão
             }
             
+
+            d-flex justify-content-between align-items-center
+
+
+
+
+agendada_form = forms.EntregaAgendadaForm(request.POST)
+                if agendada_form.is_valid():
+                    try:
+                        entrega_agendada = EntregaAgendada.objects.get(
+                            pedido=pedido,
+                            endereco_loja=loja.endereco,
+                            is_active=True
+                        )
+                        # Atualiza os campos da entrega agendada existente
+                        for field, value in agendada_form.cleaned_data.items():
+                            setattr(entrega_agendada, field, value)
+                    except EntregaAgendada.DoesNotExist:
+                        # Deleta as entregas relacionadas ao mesmo pedido e loja
+                        Entrega.objects.filter(
+                            pedido=pedido, 
+                            endereco_loja=loja.endereco
+                        ).delete()
+                        # Cria uma nova entrega agendada
+                        entrega_agendada = agendada_form.save(commit=False)
+                        entrega_agendada.pedido = pedido
+                        entrega_agendada.endereco_loja = loja.endereco
+                        entrega_agendada.forma_de_entrega = forma_de_entrega
+                        # Copia os campos relevantes da entrega original
+                        entrega_agendada.taxa_de_entrega = entrega.taxa_de_entrega
+                        entrega_agendada.peso = entrega.peso
+                        entrega_agendada.volume = entrega.volume
+                        entrega_agendada.entrega_pelo_app = entrega.entrega_pelo_app
+
+                    # Desativa a entrega original
+                    entrega.is_active = False
+                    entrega.save()
+
+                    # Salva a entrega agendada
+                    entrega_agendada.save()
+                else:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse(
+                            {"status": "error", "message": "Erro na validação da entrega agendada"},
+                            status=400
+                        )
+                    messages.error(request, "Erro na validação da entrega agendada")
+                    return redirect('ecommerce:confirmar_pedido')

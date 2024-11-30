@@ -1,8 +1,69 @@
-{% extends "empresarial/layout.html" %}
+{% extends "ecommerce/layout.html" %}
 
-{% block title %}Cadastre seu endereco{% endblock title %}
+{% block title %}Status do Pedido{% endblock title %}
 
 {% block body %}
-    <h2>Pedido confirmado</h2>
-    <p>Aguardando confirmação da loja...</p>
+<div class="container mt-4">
+    <h2>Status do Pedido</h2>
+
+    <!-- Status geral do pedido -->
+    <div class="mb-3">
+        <span class="badge 
+            {% if pedido.status == 'confirmado' %}bg-primary
+            {% elif pedido.status == 'cancelado' %}bg-danger
+            {% elif pedido.status == 'entregue' %}bg-success
+            {% else %}bg-secondary{% endif %}">
+            {{ pedido.get_status_display }}
+        </span>
+    </div>
+
+    <!-- Entregas relacionadas ao pedido -->
+    <div class="row">
+        {% for entrega in entregas %}
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <strong>Entrega #{{ entrega.id }}</strong> - 
+                    {{ entrega.endereco_loja.loja_set.first.nome }}
+                </div>
+                <div class="card-body">
+                    <p><strong>Forma de entrega:</strong> {{ entrega.get_forma_de_entrega_display }}</p>
+                    <p><strong>Taxa de entrega:</strong> R$ {{ entrega.taxa_de_entrega }}</p>
+
+                    <!-- Barra de progresso -->
+                    <div class="progress mb-3">
+                        <div class="progress-bar 
+                            {% if entrega.status == 'aguardando confirmação da loja' %}bg-warning
+                            {% elif entrega.status == 'preparando o pedido' %}bg-info
+                            {% elif entrega.status == 'a caminho da loja' %}bg-primary
+                            {% elif entrega.status == 'saiu para entrega' %}bg-success
+                            {% elif entrega.status == 'entregue' %}bg-success
+                            {% elif entrega.status == 'cancelada' %}bg-danger
+                            {% endif %}" 
+                            role="progressbar"
+                            style="width: 
+                                {% if entrega.status == 'aguardando confirmação da loja' %}20%
+                                {% elif entrega.status == 'preparando o pedido' %}40%
+                                {% elif entrega.status == 'a caminho da loja' %}60%
+                                {% elif entrega.status == 'saiu para entrega' %}80%
+                                {% elif entrega.status == 'entregue' %}100%
+                                {% else %}0%
+                                {% endif %};">
+                            {{ entrega.get_status_display }}
+                        </div>
+                    </div>
+
+                    <!-- Exibição de itens relacionados -->
+                    <h6>Itens:</h6>
+                    <ul>
+                        {% for item in entrega.itens %}
+                        <li>{{ item.produto.nome }} - {{ item.quantidade }}x</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock body %}

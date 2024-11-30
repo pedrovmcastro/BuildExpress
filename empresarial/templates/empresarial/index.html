@@ -1,5 +1,7 @@
 {% extends "empresarial/layout.html" %}
 
+{% load custom_filters %}
+
 {% block title %}Dashboard{% endblock title %}
 
 {% block body %}
@@ -10,7 +12,50 @@
             <div class="border p-3">
                 <h4>Vendas</h4>
                 <!-- Aqui você pode adicionar gráficos ou informações de vendas -->
-                <p>Informações sobre vendas...</p>
+                <ul>
+                    {% for entrega in entregas %}
+                        <li>Pedido #{{ entrega.pedido.id }} - {{ entrega.pedido.datetime }}</li>
+
+                        <p><strong>Status:</strong>
+                            <span class="badge 
+                                {% if entrega.status == 'entregue' %}
+                                    bg-success
+                                {% elif entrega.status == 'cancelada' %}
+                                    bg-danger
+                                {% elif entrega.status == 'saiu para entrega' %}
+                                    bg-primary
+                                {% elif entrega.status == 'a caminho da loja' %}
+                                    bg-info
+                                {% elif entrega.status == 'preparando o pedido' %}
+                                    bg-warning
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}
+                            ">
+                                {{ entrega.get_status_display }}
+                            </span>
+                        </p>
+                        <!-- Listando os itens da entrega -->
+                        <ul>
+                            {% for item in entrega.itens %}
+                                <li>{{ item.quantidade }}x {{ item.produto }}: <strong>R$ {{ item.produto.preco|mul:item.quantidade }}</strong></li>
+                            {% endfor %}
+                        </ul>
+
+                        <!-- Calculando o valor total da entrega -->
+                        <p><strong>Total:</strong> R$ {{ entrega.total_itens }}</p>
+
+                        {% if entrega.status == 'aguardando confirmação da loja' %}
+                            <a href="{% url 'empresarial:preparar_pedido' entrega.id %}" class="btn btn-sm btn-success mb-4">Confirmar</a>
+                        {% elif entrega.status == 'preparando o pedido' %}
+                            {% if entrega.entrega_pelo_app %}
+                                <a href="#" class="btn btn-sm btn-warning mb-4">Acionar entrega</a>
+                            {% else %}
+                                <a href="#" class="btn btn-sm btn-warning mb-4">Fazer entrega</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
             </div>
         </div>
         <div class="col-md-8"> <!-- Coluna para a lista de produtos -->

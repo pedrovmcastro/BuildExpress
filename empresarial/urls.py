@@ -22,6 +22,7 @@ urlpatterns = [
     path("produto/<int:id_produto>/editar", views.editar_produto, name="editar_produto"),
     path("produto/<int:id_produto>/deletar", views.deletar_produto, name="deletar_produto"),
     path("loja", views.configurar_loja, name="loja"),
+    path("preparar_pedido/<int:id_entrega>", views.preparar_pedido, name="preparar_pedido"),
 ]
 
 if settings.DEBUG:

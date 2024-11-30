@@ -7,7 +7,8 @@ from django.views import View
 from django.db import IntegrityError
 from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, ProdutoForm, MinhaLojaForm, NewLogoForm, EditLogoForm
 from .models import Lojista, Plano
-from ecommerce.models import Endereco, Loja, Produto
+from ecommerce.models import Endereco, Loja, Produto, Pedido, ItemCarrinho
+from entregas.models import Entrega, EntregaAgendada
 from .forms import LojistaLoginForm, LojistaForm
 from .decorators import lojista_required
 
@@ -15,8 +16,22 @@ from .decorators import lojista_required
 def index(request):
     if request.user.is_authenticated and request.user.is_lojista:
         produtos = Produto.objects.filter(loja__lojista=request.user)
+        entregas = Entrega.objects.filter(endereco_loja__loja__lojista=request.user, is_active=True).order_by('-datetime')
+
+        # Calculando o total de cada entrega e buscando os itens do carrinho do pedido
+        for entrega in entregas:
+            # Acessa a loja relacionada ao endereço da entrega
+            loja = entrega.endereco_loja.loja_set.first()
+
+            # Filtra os itens do carrinho que pertencem à loja específica
+            itens = entrega.pedido.carrinho.itemcarrinho_set.filter(produto__loja=loja).select_related('produto')
+
+            entrega.total_itens = sum(item.calcular_total() for item in itens)
+            entrega.itens = itens
+
         return render(request, 'empresarial/index.html', {
-            'produtos': produtos
+            'produtos': produtos,
+            'entregas': entregas
         })
     return redirect("empresarial:cadastro_inicial")
 
@@ -305,3 +320,17 @@ def configurar_loja(request):
         'loja': loja
     })
 
+
+@lojista_required
+def preparar_pedido(request, id_entrega):
+    entrega = get_object_or_404(Entrega, id=id_entrega)
+
+    # Verifica se o lojista autenticado é o responsável pela loja associada ao endereço da entrega
+    loja = Loja.objects.filter(endereco=entrega.endereco_loja).first()
+    if loja and loja.lojista == request.user:
+        entrega.status = 'preparando o pedido'
+        entrega.save()
+        return redirect("empresarial:index")
+
+    # Se a validação falhar, lança uma exceção de permissão negada
+    raise PermissionDenied

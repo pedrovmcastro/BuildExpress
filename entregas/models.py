@@ -53,7 +53,7 @@ class Motorista(AbstractBaseUser):
 class Entrega(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)    # Atualizada na view ecommerce:forma_de_entrega
     endereco_loja = models.ForeignKey(Endereco, on_delete=models.CASCADE)   # Atualizada na view ecommerce:forma_de_entrega
-    motorista = models.ForeignKey(Motorista, on_delete=models.SET_NULL, null=True, default=None)
+    motorista = models.ForeignKey(Motorista, on_delete=models.SET_NULL, blank=True, null=True, default=None)
     forma_de_entrega = models.CharField(max_length=20, choices=[('expressa', 'Expressa'), ('agendada', 'Agendada')], default='expressa')  # Atualizada na view ecommerce:forma_de_entrega
     entrega_pelo_app = models.BooleanField(default=True)   # É preciso implementar isso a depender do plano da loja...
     taxa_de_entrega = models.DecimalField(max_digits=10, decimal_places=2, default=None, null=True)   # Atualizada na view ecommerce:confirmar_pedido  | não vai ser alterada por "entrega_pelo_app"

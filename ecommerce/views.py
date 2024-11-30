@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.db import IntegrityError
-from django.db.models import Avg
+from django.db.models import Avg, Prefetch
 from decimal import Decimal
 from django.urls import reverse
 from django.views import View
@@ -315,19 +315,26 @@ def remover_do_carrinho(request, id_produto):
 @usuario_comum_required
 def abandonar_carrinho(request, id_carrinho):
     carrinho = get_object_or_404(Carrinho, id=id_carrinho)
-    carrinho.status = "abandonado"
-    carrinho.is_active = False
-    carrinho.save()
-    return redirect('ecommerce:index')
+
+    if request.user.is_authenticated and request.user == carrinho.user:
+        carrinho.status = "abandonado"
+        carrinho.is_active = False
+        carrinho.save()
+        return redirect('ecommerce:index')
+    else:
+        return PermissionDenied
 
 
 @usuario_comum_required
 def finalizar_carrinho(request, id_carrinho):
     carrinho = get_object_or_404(Carrinho, id=id_carrinho)
-    carrinho.status = "finalizado"
-    carrinho.save()
 
-    return redirect('ecommerce:exibir_enderecos')
+    if request.user.is_authenticated and request.user == carrinho.user:
+        carrinho.status = "finalizado"
+        carrinho.save()
+        return redirect('ecommerce:exibir_enderecos')
+    else:
+        return PermissionDenied
 
 
 # CHECKOUT
@@ -420,16 +427,22 @@ def confirmar_pedido(request):
         taxa_volume = Decimal(volume_total) * Decimal("0.30")
         taxa = taxa_base + taxa_peso + taxa_volume
 
+        # Verificando o plano da loja
+        entrega_pelo_app = True
+        if loja.plano == 'basico':
+            entrega_pelo_app = False
+
         try:
             entrega = Entrega.objects.get(
                 pedido=pedido,
                 endereco_loja=loja.endereco,
-                is_active=True
+                is_active=True,
             )
             # Atualizar valores
             entrega.taxa_de_entrega = round(taxa, 2)
             entrega.peso = peso_total
             entrega.volume = volume_total
+            entrega.entrega_pelo_app = entrega_pelo_app
             entrega.save()
         except Entrega.DoesNotExist:
             # Criar nova entrega
@@ -439,23 +452,24 @@ def confirmar_pedido(request):
                 taxa_de_entrega=round(taxa, 2),
                 peso=peso_total,
                 volume=volume_total,
-                forma_de_entrega='expressa'
+                forma_de_entrega='expressa',
+                entrega_pelo_app=entrega_pelo_app
             )
         except Entrega.MultipleObjectsReturned:
-            # Se houver múltiplas entregas ativas, desativa todas e cria uma nova
+            # Se houver múltiplas entregas ativas, deleta a anterior e cria uma nova
             Entrega.objects.filter(
-                pedido=pedido,
-                endereco_loja=loja.endereco,
-                is_active=True
-            ).update(is_active=False)
-
+                pedido=pedido, 
+                endereco_loja=loja.endereco
+            ).delete()
+            
             entrega = Entrega.objects.create(
                 pedido=pedido,
                 endereco_loja=loja.endereco,
                 taxa_de_entrega=round(taxa, 2),
                 peso=peso_total,
                 volume=volume_total,
-                forma_de_entrega='expressa'  # valor padrão
+                forma_de_entrega='expressa', # valor padrão
+                entrega_pelo_app = entrega_pelo_app
             )
 
         entrega_dict = {
@@ -565,49 +579,43 @@ def forma_de_entrega(request):
             if forma_de_entrega == 'agendada':
                 agendada_form = forms.EntregaAgendadaForm(request.POST)
                 if agendada_form.is_valid():
-                    try:
-                        entrega_agendada = EntregaAgendada.objects.get(
-                            pedido=pedido,
-                            endereco_loja=loja.endereco,
-                            is_active=True
-                        )
-                        # Atualiza os campos da entrega agendada existente
-                        for field, value in agendada_form.cleaned_data.items():
-                            setattr(entrega_agendada, field, value)
-                    except EntregaAgendada.DoesNotExist:
-                        # Cria uma nova entrega agendada
-                        entrega_agendada = agendada_form.save(commit=False)
-                        entrega_agendada.pedido = pedido
-                        entrega_agendada.endereco_loja = loja.endereco
-                        entrega_agendada.forma_de_entrega = forma_de_entrega
-                        # Copia os campos relevantes da entrega original
-                        entrega_agendada.taxa_de_entrega = entrega.taxa_de_entrega
-                        entrega_agendada.peso = entrega.peso
-                        entrega_agendada.volume = entrega.volume
+                    # Deletar todas as entregas relacionadas ao mesmo pedido e loja
+                    Entrega.objects.filter(
+                        pedido=pedido,
+                        endereco_loja=loja.endereco
+                    ).delete()
 
-                    # Desativa a entrega original
-                    entrega.is_active = False
-                    entrega.save()
+                    # Criar uma nova entrega agendada
+                    entrega_agendada = agendada_form.save(commit=False)
+                    entrega_agendada.pedido = pedido
+                    entrega_agendada.endereco_loja = loja.endereco
+                    entrega_agendada.forma_de_entrega = forma_de_entrega
+                    entrega_agendada.taxa_de_entrega = entrega.taxa_de_entrega
+                    entrega_agendada.peso = entrega.peso
+                    entrega_agendada.volume = entrega.volume
+                    entrega_agendada.entrega_pelo_app = entrega.entrega_pelo_app
 
-                    # Salva a entrega agendada
+                    # Salvar a nota entrega agendada
                     entrega_agendada.save()
-                else:
-                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse(
-                            {"status": "error", "message": "Erro na validação da entrega agendada"},
-                            status=400
-                        )
-                    messages.error(request, "Erro na validação da entrega agendada")
-                    return redirect('ecommerce:confirmar_pedido')
-            else:
-                entrega.save()
-            
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({"status": "success"})
-            
-            messages.success(request, "Forma de entrega atualizada com sucesso")
-            return redirect('ecommerce:confirmar_pedido')
 
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({"status": "success"})
+                    
+                    messages.success(request, "Entrega agendada com sucesso")
+                    return redirect("ecommerce:confirmar_pedido")
+                
+                # Erro na validação do formulário de agendamento
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse(
+                        {"status": "error", "message": "Erro na validação da entrega agendada"},
+                        status=400
+                    )
+                messages.error(request, "Erro na validação da entrega agendada")
+                return redirect('ecommerce:confirmar_pedido')
+
+            # Salvar forma de entrega diferente da 'agendada'
+            entrega.save()
+            
         # Erro na validação do formulário
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse(
@@ -618,3 +626,48 @@ def forma_de_entrega(request):
         
     return redirect('ecommerce:confirmar_pedido')
 
+
+def meus_pedidos(request):
+    # Carrega pedidos ativos e entregas relacionadas
+    pedidos_ativos = Pedido.objects.filter(user=request.user, is_active=True).order_by('-datetime').prefetch_related(
+        Prefetch('entrega_set', queryset=Entrega.objects.select_related('endereco_loja'), to_attr='entregas')
+    )
+
+    # Carrega pedidos inativos e entregas relacionadas
+    pedidos = Pedido.objects.filter(user=request.user, is_active=False).order_by('-datetime').prefetch_related(
+        Prefetch('entrega_set', queryset=Entrega.objects.select_related('endereco_loja'), to_attr='entregas')
+    )
+
+    # Processa os pedidos para incluir os itens relacionados a cada entrega
+    for pedido in pedidos_ativos:
+        for entrega in pedido.entregas:
+            # Acessa a loja relacionada ao endereço
+            loja = entrega.endereco_loja.loja_set.first()
+            entrega.itens = pedido.carrinho.itemcarrinho_set.filter(
+                produto__loja=loja
+            ).select_related('produto')
+
+    for pedido in pedidos:
+        for entrega in pedido.entregas:
+            loja = entrega.endereco_loja.loja_set.first()
+            entrega.itens = pedido.carrinho.itemcarrinho_set.filter(
+                produto__loja=loja
+            ).select_related('produto')
+
+    return render(request, 'ecommerce/meus_pedidos.html', {
+        'pedidos_ativos': pedidos_ativos,
+        'pedidos': pedidos
+    })
+
+
+@usuario_comum_required
+def cancelar_pedido(request, id_pedido):
+    pedido = get_object_or_404(Pedido, id=id_pedido)
+
+    if request.user.is_authenticated and request.user == pedido.user:
+        pedido.status = "cancelado"
+        pedido.is_active = False
+        pedido.save()
+        return redirect('ecommerce:index')
+    else:
+        return PermissionDenied

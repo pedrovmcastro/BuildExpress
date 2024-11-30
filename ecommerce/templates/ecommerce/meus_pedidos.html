@@ -1,8 +1,139 @@
-{% extends "empresarial/layout.html" %}
-
-{% block title %}Meus pedidos{% endblock title %}
+{% extends "ecommerce/layout.html" %}
 
 {% block body %}
-    <h2>O pedido está sendo preparado</h2>
-{% endblock body %}
+    <div class="container my-4">
+        <h2 class="mb-4">Meus Pedidos</h2>
 
+        {% if not pedidos_ativos and not pedidos %}
+            <div class="alert alert-info" role="alert">
+                Você ainda não possui nenhum pedido.
+            </div>
+        {% else %}
+            <!-- Pedidos Ativos -->
+            {% if pedidos_ativos %}
+                <h3 class="mb-3">Pedidos Ativos</h3>
+                <div class="accordion mb-4" id="pedidosAtivosAccordion">
+                    {% for pedido in pedidos_ativos %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="pedidoAtivoHeading{{ pedido.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pedidoAtivo{{ pedido.id }}" aria-expanded="false" aria-controls="pedidoAtivo{{ pedido.id }}">
+                                    Pedido #{{ pedido.id }} - {{ pedido.datetime|date:"d/m/Y" }}
+                                </button>
+                            </h2>
+                            <div id="pedidoAtivo{{ pedido.id }}" class="accordion-collapse collapse" aria-labelledby="pedidoAtivoHeading{{ pedido.id }}" data-bs-parent="#pedidosAtivosAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Status:</strong> {{ pedido.status }}</p>
+                                    <p><strong>Entregas:</strong></p>
+                                    <ul class="list-group">
+                                        {% for entrega in pedido.entregas %}
+                                            <li class="list-group-item">
+                                                <h5>
+                                                    Entrega #{{ entrega.id }} - Loja:
+                                                    {% with loja=entrega.endereco_loja.loja_set.first %}
+                                                        {{ loja.nome }}
+                                                    {% endwith %}
+                                                </h5>
+                                                <p><strong>Status:</strong>
+                                                    <span class="badge 
+                                                        {% if entrega.status == 'entregue' %}
+                                                            bg-success
+                                                        {% elif entrega.status == 'cancelada' %}
+                                                            bg-danger
+                                                        {% elif entrega.status == 'saiu para entrega' %}
+                                                            bg-primary
+                                                        {% elif entrega.status == 'a caminho da loja' %}
+                                                            bg-info
+                                                        {% elif entrega.status == 'preparando o pedido' %}
+                                                            bg-warning
+                                                        {% else %}
+                                                            bg-secondary
+                                                        {% endif %}
+                                                    ">
+                                                        {{ entrega.status }}
+                                                    </span>
+                                                </p>
+                                                <p><strong>Itens:</strong></p>
+                                                <ul>
+                                                    {% for item in entrega.itens %}
+                                                        <li class="d-flex align-items-center mb-2">
+                                                            <img src="{{ item.produto.photo.url }}" alt="{{ item.produto.nome }}" width="50px" height="50px">
+                                                            <span>{{ item.produto.nome }} - Quantidade: {{ item.quantidade }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Pedidos Inativos -->
+            {% if pedidos %}
+                <h3 class="mb-3">Pedidos Finalizados</h3>
+                <div class="accordion mb-4" id="pedidosInativosAccordion">
+                    {% for pedido in pedidos %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="pedidoInativoHeading{{ pedido.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pedidoInativo{{ pedido.id }}" aria-expanded="false" aria-controls="pedidoInativo{{ pedido.id }}">
+                                    Pedido #{{ pedido.id }} - {{ pedido.datetime|date:"d/m/Y" }}
+                                </button>
+                            </h2>
+                            <div id="pedidoInativo{{ pedido.id }}" class="accordion-collapse collapse" aria-labelledby="pedidoInativoHeading{{ pedido.id }}" data-bs-parent="#pedidosInativosAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Status:</strong> {{ pedido.status }}</p>
+                                    <p><strong>Entregas:</strong></p>
+                                    <ul class="list-group">
+                                        {% for entrega in pedido.entregas %}
+                                            <li class="list-group-item">
+                                                <h5>
+                                                    Entrega #{{ entrega.id }} - Loja:
+                                                    {% with loja=entrega.endereco_loja.loja_set.first %}
+                                                        {{ loja.nome }}
+                                                    {% endwith %}
+                                                </h5>
+
+                                                <p><strong>Status:</strong>
+                                                    <span class="badge 
+                                                        {% if entrega.status == 'entregue' %}
+                                                            bg-success
+                                                        {% elif entrega.status == 'cancelada' %}
+                                                            bg-danger
+                                                        {% elif entrega.status == 'saiu para entrega' %}
+                                                            bg-primary
+                                                        {% elif entrega.status == 'a caminho da loja' %}
+                                                            bg-info
+                                                        {% elif entrega.status == 'preparando o pedido' %}
+                                                            bg-warning
+                                                        {% else %}
+                                                            bg-secondary
+                                                        {% endif %}
+                                                    ">
+                                                        {{ entrega.status }}
+                                                    </span>
+                                                </p>
+                                                <p><strong>Itens:</strong></p>
+                                                <ul>
+                                                    {% for item in entrega.itens %}
+                                                        <li class="d-flex align-items-center mb-2">
+                                                            <img src="{{ item.produto.photo.url }}" alt="{{ item.produto.nome }}" width="50px" height="50px">
+                                                            <span>{{ item.produto.nome }} - Quantidade: {{ item.quantidade }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+              
+{% endblock body %}
