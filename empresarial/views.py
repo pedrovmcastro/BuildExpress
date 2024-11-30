@@ -164,8 +164,8 @@ def concluir_cadastro(request):
             'nome': request.POST.get('lojista_nome'),
             'email': request.POST.get('lojista_email'),
             'telefone': request.POST.get('lojista_telefone'),
-            'password': make_password(request.session.get('lojista_senha'))  # Aqui você deve hashear a senha
         }
+        senha = request.session.get('lojista_senha')
 
         # Dados do endereço
         endereco_data = {
@@ -179,7 +179,7 @@ def concluir_cadastro(request):
 
         try:
             # Criação do Lojista
-            lojista = Lojista.objects.create(**lojista_data)
+            lojista = Lojista.objects.create_user(password=senha, **lojista_data)
             # Criação do Endereço
             endereco = Endereco.objects.create(**endereco_data)
         except IntegrityError as e:
@@ -207,9 +207,12 @@ def concluir_cadastro(request):
         except IntegrityError as e:
             return render(request, 'empresarial/cadastro_conclusao.html', {'error': str(e)})   
             
-        # Limpar a sessão após o cadastro
-        request.session.flush()
-
+        # Autenticar e logar o usuário
+        user = authenticate(request, email=lojista_data['email'], password=senha)
+        if user:
+            request.session.flush()
+            login(request, user)
+    
         return redirect('empresarial:index')
     
     return render(request, 'empresarial/cadastro_conclusao.html', {
