@@ -258,7 +258,7 @@ class Pedido(models.Model):
             ('confirmado', 'Confirmado'), 
             ('abandonado', 'Abandonado'), 
             ('cancelado', 'Cancelado'),
-            ('entregue', 'Entregue')], 
+            ('finalizado', 'Finalizado')], 
             default='em andamento')
     is_active = models.BooleanField(default=True)
     datetime = models.DateTimeField(auto_now_add=True)

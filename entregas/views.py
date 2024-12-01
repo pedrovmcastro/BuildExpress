@@ -163,6 +163,13 @@ def realizar_entrega(request, id_entrega):
             entrega.save()
             request.user.entregas_realizadas += 1
             request.user.save()
+
+            # Verificar se todas as entregas do pedido foram entregues
+            if not entrega.pedido.entrega_set.exclude(status='entregue').exists():
+                entrega.pedido.status = 'finalizado'
+                entrega.pedido.is_active = False
+                entrega.pedido.save()
+
             return redirect('entregas:index')
         else:
             messages.error(request, "Código incorreto")

@@ -632,7 +632,7 @@ def meus_pedidos(request):
     pedidos_ativos = Pedido.objects.filter(user=request.user, is_active=True).order_by('-datetime').prefetch_related(
         Prefetch('entrega_set', queryset=Entrega.objects.select_related('endereco_loja'), to_attr='entregas')
     )
-
+    
     # Carrega pedidos inativos e entregas relacionadas
     pedidos = Pedido.objects.filter(user=request.user, is_active=False).order_by('-datetime').prefetch_related(
         Prefetch('entrega_set', queryset=Entrega.objects.select_related('endereco_loja'), to_attr='entregas')
