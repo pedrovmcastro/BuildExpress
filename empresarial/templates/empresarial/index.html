@@ -14,7 +14,7 @@
                 <!-- Aqui você pode adicionar gráficos ou informações de vendas -->
                 <ul>
                     {% for entrega in entregas %}
-                        <li>Pedido #{{ entrega.pedido.id }} - {{ entrega.pedido.datetime }}</li>
+                        <li><h6 class="text-danger"><strong>Pedido #{{ entrega.pedido.id }} - {{ entrega.pedido.datetime }}</strong></h6></li>
 
                         <p><strong>Status:</strong>
                             <span class="badge 
@@ -28,6 +28,8 @@
                                     bg-info
                                 {% elif entrega.status == 'preparando o pedido' %}
                                     bg-warning
+                                {% elif entrega.status == 'pedido preparado' %}
+                                    bg-info
                                 {% else %}
                                     bg-secondary
                                 {% endif %}
@@ -49,11 +51,16 @@
                             <a href="{% url 'empresarial:preparar_pedido' entrega.id %}" class="btn btn-sm btn-success mb-4">Confirmar</a>
                         {% elif entrega.status == 'preparando o pedido' %}
                             {% if entrega.entrega_pelo_app %}
-                                <a href="#" class="btn btn-sm btn-warning mb-4">Acionar entrega</a>
+                                <a href="{% url 'empresarial:acionar_entrega' entrega.id %}" class="btn btn-sm btn-warning mb-4">Acionar entrega</a>
                             {% else %}
-                                <a href="#" class="btn btn-sm btn-warning mb-4">Fazer entrega</a>
+                                <a href="{% url 'empresarial:saiu_para_entrega' entrega.id %}" class="btn btn-sm btn-warning mb-4">Saiu para entrega</a>
                             {% endif %}
+                        {% elif entrega.status == 'a caminho da loja' %}
+                            <a href="{% url 'empresarial:saiu_para_entrega' entrega.id %}" class="btn btn-sm btn-success mb-4">Saiu para entrega</a>
                         {% endif %}
+
+                        <!-- Linha divisória entre os pedidos -->
+                        <hr class="my-4">
                     {% endfor %}
                 </ul>
             </div>

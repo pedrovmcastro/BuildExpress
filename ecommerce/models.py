@@ -95,6 +95,9 @@ class UsuarioComum(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return self.is_superuser
     
+    def codigo_de_entrega(self):
+        return self.telefone[-4:]
+    
     
 class Endereco(models.Model):
     cep = models.CharField(max_length=15)

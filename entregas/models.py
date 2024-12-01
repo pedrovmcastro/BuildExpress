@@ -24,6 +24,9 @@ class Motorista(AbstractBaseUser):
     cpf = models.CharField(max_length=15, unique=True)
     cnh = models.CharField(max_length=15, unique=True)
     nota = models.FloatField(default=None, null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    entregas_realizadas = models.IntegerField(default=0)
+    entregas_recusadas = models.IntegerField(default=0)
+    entregas_canceladas = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # Para permitir acesso ao admin
     is_superuser = models.BooleanField(default=False)  # Para permitir permissões de superusuário
@@ -65,6 +68,7 @@ class Entrega(models.Model):
         choices=[
             ('aguardando confirmação da loja', 'Aguardando confirmação da loja'),
             ('preparando o pedido', 'Preparando o pedido'),
+            ('pedido preparado', 'Pedido preparado'),
             ('a caminho da loja', 'A caminho da loja'), 
             ('saiu para entrega', 'Saiu para entrega'),   
             ('cancelada', 'Cancelada'),
@@ -74,7 +78,7 @@ class Entrega(models.Model):
     )
     
     def __str__(self):
-        return f"Entrega {self.id}: para {self.pedido.user} do pedido {self.pedido.id} - {self.status}"
+        return f"Entrega {self.id}: para {self.pedido.user} - STATUS: {self.status}"
     
 
 class EntregaAgendada(Entrega):
@@ -84,4 +88,17 @@ class EntregaAgendada(Entrega):
         return f"Entrega {self.id} para {self.pedido.user} a ser realizada em {self.datetime_entrega.strftime('%d/%m/%Y %H:%M')}"
 
 
+class EntregaRecusada(models.Model):
+    entrega = models.ForeignKey(Entrega, on_delete=models.CASCADE)
+    motorista = models.ForeignKey(Motorista, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Entrega {self.entrega.id} recusada por {self.motorista.nome} ({self.motorista.id})"
+    
+
+class EntregaCanceladaPeloMotorista(models.Model):
+    entrega = models.ForeignKey(Entrega, on_delete=models.CASCADE)
+    motorista = models.ForeignKey(Motorista, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Entrega {self.entrega.id} cancelada por {self.motorista.nome} ({self.motorista.id})"

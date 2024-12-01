@@ -23,6 +23,8 @@ urlpatterns = [
     path("produto/<int:id_produto>/deletar", views.deletar_produto, name="deletar_produto"),
     path("loja", views.configurar_loja, name="loja"),
     path("preparar_pedido/<int:id_entrega>", views.preparar_pedido, name="preparar_pedido"),
+    path("acionar_entrega/<int:id_entrega>", views.acionar_entrega, name="acionar_entrega"),
+    path("saiu_para_entrega/<int:id_entrega>", views.saiu_para_entrega, name="saiu_para_entrega")
 ]
 
 if settings.DEBUG:

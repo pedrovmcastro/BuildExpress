@@ -3,9 +3,147 @@
 {% block title %}Home{% endblock title %}
 
 {% block body %}
-    <h2>Home do Motorista</h2>
+    
+<div class="container mt-4">
+    <h2>Página do motorista</h2>
+    <div class="row">
+        <div class="col-md-8"> <!-- Coluna para a lista de produtos -->
+            <div class="entrega border p-3">
+                <h4>Entrega</h4>
+                <!-- Mensagens de alerta -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger fade show" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-    <p>Você está logado como: {{ user }}</p>
-    <p>Request user: {{ request.user }}</p>
+                {% if entrega %}
+                
+                    <!-- Informações sobre a entrega -->
+                    {% if not entrega_aceita %}
+                        <div class="mb-3">
+                            <strong>{{ loja }}</strong><br>
+                            <small>Endereço da loja: {{ loja.endereco }}</small><br>
+                            <strong>Cliente:</strong> {{ entrega.pedido.user.nome }}<br>
+                            <strong>Endereço do cliente:</strong> {{ entrega.pedido.endereco_user }}<br>
+                            <strong>Pedido feito em:</strong> {{ entrega.datetime|date:"d/m/Y H:i" }}<br>
+                        </div>
+                    {% elif entrega_aceita and entrega.status == 'a caminho da loja' %}
+                        <p>Dirija-se à loja <strong>{{ loja }}</strong></p>
+                        <p><strong>{{ loja.endereco }}</strong></p>
+                    {% elif entrega_aceita and entrega.status == 'saiu para entrega' %}
+                        <p>Dirija-se ao endereço do cliente <strong>{{ entrega.pedido.user.nome }}</strong></p>
+                        <p><strong>{{ entrega.pedido.endereco_user }}</strong></p>
+                    {% endif %}
 
+                     <!-- Ações de entrega (aceitar/recusar) -->
+                    {% if not entrega_aceita %}
+                        <div class="d-flex gap-2 mb-3">
+                            <form action="{% url 'entregas:aceitar_entrega' entrega.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-aesthetic">
+                                    <i class="bi bi-check-circle"></i> Aceitar
+                                </button>
+                            </form>
+                            <form action="{% url 'entregas:recusar_entrega' entrega.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-aesthetic">
+                                    <i class="bi bi-x-circle"></i> Recusar
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        {% if entrega.status == 'saiu para entrega' %}
+                            <form id="confirmar_codigo_entrega_form" action="{% url 'entregas:realizar_entrega' entrega.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <div class="form-group d-inline">
+                                    <label for="codigo-entrega" class="sr-only">Código de entrega</label>
+                                    <input 
+                                        type="text" 
+                                        id="codigo-entrega" 
+                                        name="codigo_entrega" 
+                                        maxlength="4" 
+                                        pattern="\d{4}" 
+                                        class="form-control d-inline w-auto" 
+                                        placeholder="Código (4 dígitos)" 
+                                        required>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-aesthetic">
+                                    <i class="bi bi-check-circle"></i> Confirmar
+                                </button>
+                            </form>
+                        {% endif %}
+                        <div class="mb-3">
+                            <form action="{% url 'entregas:cancelar_entrega' entrega.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-aesthetic mt-3">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <!-- Barra de progresso de status (exemplo) -->
+                    <div class="progress">
+                        <div id="progress-bar" 
+                        class="progress-bar" 
+                        role="progressbar" 
+                        style="width: 0%" 
+                        aria-valuemin="0" 
+                        aria-valuemax="100" 
+                        data-status="{{ entrega.status }}">
+                            {{ entrega.get_status_display }}
+                        </div>
+                    </div>
+
+                {% else %}
+                    {% if mensagem %}
+                        <div class="alert alert-info" role="alert">
+                            {{ mensagem }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4"> <!-- Coluna informações do motorista -->
+            <div class="border p-3">
+                <h4>Meu desempenho</h4>
+                <ul>
+                    <li><strong>Entregas realizadas:</strong> {{ request.user.entregas_realizadas }}</li>
+                    <li><strong>Entregas recusadas:</strong> {{ request.user.entregas_recusadas }}</li>
+                    <li><strong>Entregas canceladas:</strong> {{ request.user.entregas_canceladas }}</li>
+                    <li><strong>Avaliação média:</strong> 4.8/5</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtenha a barra de progresso pelo ID
+        const progressBar = document.getElementById("progress-bar");
+        
+        // Verifique se a barra de progresso existe
+        if (progressBar) {
+            // Mapeie os status para porcentagens
+            const statusMap = {
+                "preparando o pedido": 25,
+                "pedido preparado": 40,
+                "a caminho da loja": 50,
+                "saiu para entrega": 75,
+                "entregue": 100,
+            };
+
+            // Obtenha o status atual da entrega
+            const currentStatus = progressBar.dataset.status;
+
+            // Verifique o valor correspondente no mapa e atualize a largura
+            const progress = statusMap[currentStatus] || 0; // Default para 0% se o status não existir
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute("aria-valuenow", progress); // Atualiza o atributo de acessibilidade
+        }
+    });
+</script>
 {% endblock body %}

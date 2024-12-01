@@ -216,3 +216,40 @@ label {
 #forma_entrega {
     transition: border 0.3s ease;  /* Suaviza a transição da borda vermelha */
 }
+
+
+/* PAGINA DO MOTORISTA */
+
+/* Estilo para os botões "aesthetic" */
+.btn-aesthetic {
+    font-size: 1rem; /* Ajusta o tamanho da fonte */
+    padding: 0.5rem 1rem; /* Espaçamento interno */
+    border-radius: 0.5rem; /* Bordas arredondadas */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaçamento entre ícone e texto */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Efeito de animação */
+}
+
+/* Efeitos de hover */
+.btn-aesthetic:hover {
+    transform: translateY(-3px); /* Eleva o botão */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Aumenta a sombra */
+}
+
+/* Ícones (se usados com Bootstrap Icons) */
+.btn-aesthetic i {
+    font-size: 1.2rem; /* Ajusta o tamanho do ícone */
+}
+
+/* Ajuste específico para botões de sucesso e perigo */
+.btn-success.btn-aesthetic {
+    background: linear-gradient(45deg, #28a745, #218838); /* Gradiente para "Aceitar" */
+    border: none;
+}
+
+.btn-danger.btn-aesthetic {
+    background: linear-gradient(45deg, #dc3545, #c82333); /* Gradiente para "Recusar" */
+    border: none;
+}

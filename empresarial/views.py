@@ -337,3 +337,29 @@ def preparar_pedido(request, id_entrega):
 
     # Se a validação falhar, lança uma exceção de permissão negada
     raise PermissionDenied
+
+
+@lojista_required
+def acionar_entrega(request, id_entrega):
+    entrega = get_object_or_404(Entrega, id=id_entrega)
+
+    loja = Loja.objects.filter(endereco=entrega.endereco_loja).first()
+    if loja and loja.lojista == request.user:
+        entrega.status = 'pedido preparado'
+        entrega.save()
+        return redirect("empresarial:index")
+    
+    raise PermissionDenied
+
+
+@lojista_required
+def saiu_para_entrega(request, id_entrega):
+    entrega = get_object_or_404(Entrega, id=id_entrega)
+
+    loja = Loja.objects.filter(endereco=entrega.endereco_loja).first()
+    if loja and loja.lojista == request.user:
+        entrega.status = 'saiu para entrega'
+        entrega.save()
+        return redirect("empresarial:index")
+    
+    raise PermissionDenied
