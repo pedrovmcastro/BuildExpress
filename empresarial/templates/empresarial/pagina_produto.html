@@ -1,19 +1,26 @@
 {% extends "empresarial/layout.html" %}
 
+{% load empresarial_filters %}
+
 {% block title %}Página do Produto{% endblock title %}
 
 {% block body %}
     <h2>{{ produto }}</h2>
 
     <!--Nota do produto-->
+    <span class="star-rating">
+        {% for i in 5|to_range_D:0 %}
+            {% if i <= produto.nota %}
+                <span class="filled-star star-size">★</span>
+            {% else %}
+                <span class="empty-star star-size">★</span>
+            {% endif %}
+        {% endfor %}
+    </span>
     {% if produto.nota %}
-        <div class="mb-3">
-            {{ produto.nota }} ({{ produto.avaliacoes }})
-        </div>
+        <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
     {% else %}
-        <div class="mb-3">
-            Nenhuma avaliacao ({{ avaliacoes|length }})
-        </div>
+        <p>Nenhuma avaliação (0)</p>
     {% endif %}
 
     <!--Detalhes do Produto -->
@@ -78,12 +85,21 @@
                 <div class="card mb-3">
                     <!-- Avaliação do produto -->
                     <div class="card-body">
-                        <p>Nota: {{ avaliacao.nota }}</p>
-                        <h6 class="card-title"><strong>{{ avaliacao.user.username }}</strong></h6>
+                        <span class="fs-3 star-rating">
+                            {% for i in 5|to_range_D:0 %}
+                                {% if i <= avaliacao.nota %}
+                                    <span class="filled-star">★</span>
+                                {% else %}
+                                    <span class="empty-star">★</span>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <p class="fs-5">Nota: {{ avaliacao.nota }}</p>
+                        <h6 class="card-title"><strong>{{ avaliacao.user.nome }}</strong></h6>
                         <p><small>{{ avaliacao.datetime }}</small></p>
                         <h5><strong>{{ avaliacao.titulo }}</strong></h5>
                         <p class="card-text">{{ avaliacao.conteudo }}</p>
-                        <p>Recomenda esse produto: {{ avaliacao.recomenda }}</p>
+                        <p>Recomenda esse produto: <strong>{% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</strong></p>
                     </div>
                     <!-- Responder avaliação -->
                 </div>

@@ -1,5 +1,7 @@
 {% extends "ecommerce/layout.html" %}
 
+{% load ecommerce_filters %}
+
 {% block body %}
     <h2 class="mb-4">Produtos</h2>
 
@@ -17,7 +19,20 @@
 
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
+                                    <span class="star-rating">
+                                        {% for i in 5|to_range_D:0 %}
+                                            {% if i <= produto.nota %}
+                                                <span class="filled-star star-size">★</span>
+                                            {% else %}
+                                                <span class="empty-star star-size">★</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    {% if produto.nota %}
+                                        <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
+                                    {% else %}
+                                        <p>Nenhuma avaliação (0)</p>
+                                    {% endif %}
                                     <h5 class="card-title"><strong>{{ produto }}</strong></h5>
                                     <p><strong>R$ {{ produto.preco }}</strong></p>
                                     <p>

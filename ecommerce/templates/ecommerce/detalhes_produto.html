@@ -136,7 +136,7 @@
                         <p><small>{{ avaliacao.datetime }}</small></p>
                         <h5><strong>{{ avaliacao.titulo }}</strong></h5>
                         <p class="card-text">{{ avaliacao.conteudo }}</p>
-                        <p>Recomenda esse produto: {% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</p>
+                        <p>Recomenda esse produto: <strong>{% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</strong></p>
                         <!--Deletar avaliacao-->
                         {% if avaliacao.user == request.user %}
                             <form method="post" action="{% url 'ecommerce:deletar_avaliacao' id_produto=produto.id id_avaliacao=avaliacao.id %}">

@@ -7,7 +7,7 @@ from django.views import View
 from django.db import IntegrityError
 from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, ProdutoForm, MinhaLojaForm, NewLogoForm, EditLogoForm
 from .models import Lojista, Plano
-from ecommerce.models import Endereco, Loja, Produto, Pedido, ItemCarrinho
+from ecommerce.models import Endereco, Loja, Produto, Pedido, ItemCarrinho, Avaliacao
 from entregas.models import Entrega, EntregaAgendada
 from .forms import LojistaLoginForm, LojistaForm
 from .decorators import lojista_required
@@ -224,10 +224,14 @@ def concluir_cadastro(request):
 def pagina_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
 
+    # Avaliacoes
+    avaliacoes = Avaliacao.objects.filter(produto=produto)
+
     if request.user.is_authenticated and produto.loja.lojista == request.user:
         return render(request, 'empresarial/pagina_produto.html', {
             'produto': produto,
             'volume': round(produto.volume_em_metros_cubicos()*1000000, 2),
+            'avaliacoes': avaliacoes
         })
     else:
         raise PermissionDenied

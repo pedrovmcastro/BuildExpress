@@ -82,7 +82,20 @@
                                             </div>
                                             <div class="col-7">
                                                 <div class="card-body">
-                                                    <p class="card-text"><small class="text-muted">{{ produto.nota }} ({{ produto.avaliacoes }})</small></p>
+                                                    <span class="star-rating">
+                                                        {% for i in 5|to_range_D:0 %}
+                                                            {% if i <= produto.nota %}
+                                                                <span class="filled-star">★</span>
+                                                            {% else %}
+                                                                <span class="empty-star">★</span>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </span>
+                                                    {% if produto.nota %}
+                                                        <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
+                                                    {% else %}
+                                                        <p>Nenhuma avaliação (0)</p>
+                                                    {% endif %}
                                                     <h6 class="card-title">{{ produto }}</h6>
                                                     <small class="card-text">R$ {{ produto.preco }}</small>
                                                 </div>
