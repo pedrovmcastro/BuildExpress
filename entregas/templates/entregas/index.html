@@ -114,7 +114,7 @@
                     <li><strong>Entregas realizadas:</strong> {{ request.user.entregas_realizadas }}</li>
                     <li><strong>Entregas recusadas:</strong> {{ request.user.entregas_recusadas }}</li>
                     <li><strong>Entregas canceladas:</strong> {{ request.user.entregas_canceladas }}</li>
-                    <li><strong>Avaliação média:</strong> 4.8/5</li>
+                    <li><strong>Avaliação média:</strong> {{ request.user.nota }}</li>
                 </ul>
             </div>
         </div>

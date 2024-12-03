@@ -14,8 +14,9 @@ from datetime import datetime, timedelta
 from itertools import groupby
 from operator import attrgetter
 from random import shuffle
+from itertools import chain
 
-from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario, Cupom, Pedido
+from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario, Cupom, Pedido, AvaliacaoMotorista, AvaliacaoLoja
 from entregas.models import Entrega, EntregaAgendada
 from . import forms
 from . import utils
@@ -653,12 +654,12 @@ def meus_pedidos(request):
             entrega.itens = pedido.carrinho.itemcarrinho_set.filter(
                 produto__loja=loja
             ).select_related('produto')
-
+    
     return render(request, 'ecommerce/meus_pedidos.html', {
         'pedidos_ativos': pedidos_ativos,
         'pedidos': pedidos
     })
-
+            
 
 @usuario_comum_required
 def cancelar_pedido(request, id_pedido):
@@ -671,3 +672,63 @@ def cancelar_pedido(request, id_pedido):
         return redirect('ecommerce:index')
     else:
         return PermissionDenied
+
+
+@usuario_comum_required
+def avaliar_entrega(request, id_entrega):
+    if request.method == 'POST':
+        motorista_nota = request.POST.get('motorista_nota')
+        loja_nota = request.POST.get('loja_nota')
+
+        if not motorista_nota or not loja_nota:
+            messages.error(request, "Por favor, avalie tanto o motorista quanto a loja")
+            return redirect("ecommerce:meus_pedidos")
+        
+        try:
+            motorista_nota, loja_nota = int(motorista_nota), int(loja_nota)
+            if not (1 <= motorista_nota <= 5 and 1 <= loja_nota <= 5):
+                raise ValueError("Notas fora do intervalo permitido")
+        except ValueError:
+            messages.error(request, "Notas inválidas. Escolha um valor entre 1 e 5.")
+            return redirect("ecommerce:meus_pedidos")
+        
+        # Obter a entrega e os objetos relacionados
+        entrega = get_object_or_404(Entrega, id=id_entrega)
+        motorista = entrega.motorista
+        loja = entrega.endereco_loja.loja_set.first()
+
+        # Avaliação do motorista
+        try:
+            avaliacao_motorista = AvaliacaoMotorista.objects.create(
+                user=request.user, motorista=motorista, nota=motorista_nota
+            )
+            motorista.nota = AvaliacaoMotorista.objects.filter(motorista=motorista).aggregate(Avg('nota'))['nota__avg']
+            motorista.save()
+            entrega.avaliou = True
+            entrega.save()
+
+        except Exception as e:
+            messages.error(request, "Erro ao avaliar o motorista. Tente Novamente.")
+            print(f"Erro ao avaliar motorista: {e}")
+            return redirect("ecommerce:meus_pedidos")
+        
+        # Avaliação da loja
+        try:
+            avaliacao_loja = AvaliacaoLoja.objects.create(
+                user=request.user, loja=loja, nota=loja_nota
+            )
+            loja.nota = AvaliacaoLoja.objects.filter(loja=loja).aggregate(Avg('nota'))['nota__avg']
+            loja.save()
+            entrega.avaliou = True
+            entrega.save()
+
+        except Exception as e:
+            messages.error(request, "Erro ao avaliar a loja. Tente Novamente.")
+            print(f"Erro ao avaliar loja: {e}")
+            return redirect("ecommerce:meus_pedidos")
+        
+        messages.success(request, "Avaliação enviada com sucesso!")
+        return redirect("ecommerce:meus_pedidos")
+    else:
+        messages.error(request, "Método inválido.")
+        return redirect("ecommerce:meus_pedidos")

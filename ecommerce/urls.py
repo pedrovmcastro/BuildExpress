@@ -33,6 +33,7 @@ urlpatterns = [
     path("checkout/confirmacao-pedido/forma-entrega", views.forma_de_entrega, name="forma_de_entrega"),
     path("checkout/confirmacao-pedido/<int:id_pedido>/cancelar", views.cancelar_pedido, name="cancelar_pedido"),
     path("pedidos", views.meus_pedidos, name="meus_pedidos"),
+    path('pedido/avaliar/<int:id_entrega>/', views.avaliar_entrega, name="avaliar_entrega"),
 ]
 
 if settings.DEBUG:

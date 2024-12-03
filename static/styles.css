@@ -253,3 +253,30 @@ label {
     background: linear-gradient(45deg, #dc3545, #c82333); /* Gradiente para "Recusar" */
     border: none;
 }
+
+
+/* MEUS PEDIDOS - AVALIAÇAO */
+.star-rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    display: inline-block;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 2em;
+    color: lightgray;
+    cursor: pointer;
+}
+
+.star-rating input:checked ~ label {
+    color: gold;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;
+}

@@ -267,3 +267,23 @@ class Pedido(models.Model):
         local_datetime = timezone.localtime(self.datetime)
         formatted_datetime = local_datetime.strftime("%d/%m/%Y às %H:%M")
         return f"Pedido {self.id} de {self.user} em {formatted_datetime} totalizando R$ {self.total}"
+
+
+class AvaliacaoMotorista(models.Model):
+    user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
+    motorista = models.ForeignKey('entregas.motorista', on_delete=models.CASCADE)
+    nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Usuário {self.user} avaliou {self.motorista} com {self.nota} estrelas"
+
+
+class AvaliacaoLoja(models.Model):
+    user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
+    loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
+    nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Usuário {self.user} avaliou a loja {self.loja} com {self.nota} estrelas"

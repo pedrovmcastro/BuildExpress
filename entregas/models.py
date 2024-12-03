@@ -76,6 +76,7 @@ class Entrega(models.Model):
         ],
         default="aguardando confirmação da loja"
     )
+    avaliou = models.BooleanField(default=False)
     
     def __str__(self):
         return f"Entrega {self.id}: para {self.pedido.user} - STATUS: {self.status}"
