@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.utils import timezone
 
 
 class LojistaManager(BaseUserManager):
@@ -60,3 +61,14 @@ class Plano(models.Model):
         return self.tipo
 
     
+class RespostaLojista(models.Model):
+    lojista = models.ForeignKey(Lojista, on_delete=models.CASCADE)
+    avaliacao = models.ForeignKey('ecommerce.avaliacao', on_delete=models.CASCADE, related_name='respostas')
+    conteudo = models.TextField( )
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        local_datetime = timezone.localtime(self.datetime)
+        formatted_datetime = local_datetime.strftime("%d/%m/%Y às %H:%M")
+        nome_usuario = getattr(self.avaliacao.user, 'nome', 'Usuário desconhecido')
+        return f"{self.lojista.loja} respondeu a avalicao {self.avaliacao.id} feita por {nome_usuario} para o produto {self.avaliacao.produto} às {formatted_datetime}"

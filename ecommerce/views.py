@@ -17,6 +17,7 @@ from random import shuffle
 from itertools import chain
 
 from .models import Produto, UsuarioComum, Loja, Categoria, Wishlist, Avaliacao, Carrinho, ItemCarrinho, Endereco, SelecaoEnderecoUsuario, Cupom, Pedido, AvaliacaoMotorista, AvaliacaoLoja
+from empresarial.models import RespostaLojista
 from entregas.models import Entrega, EntregaAgendada
 from . import forms
 from . import utils
@@ -164,8 +165,10 @@ def detalhes_produto(request, id_produto):
     form_avaliacao = None
     usuario_ja_avaliou = False
 
-    # Avaliacoes
-    avaliacoes = Avaliacao.objects.filter(produto=produto)
+    # Avaliações e Respostas
+    avaliacoes = Avaliacao.objects.filter(produto=produto).prefetch_related(
+        Prefetch('respostas', queryset=RespostaLojista.objects.select_related('lojista'))
+    )
 
     # Lógica da Wishlist e Fazer Avaliacoes
     if request.user.is_authenticated and not request.user.is_lojista and not request.user.is_motorista:

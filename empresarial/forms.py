@@ -1,5 +1,6 @@
 from django import forms
 from ecommerce.models import Endereco, Produto, Categoria, Loja
+from .models import RespostaLojista
 import re
 
 
@@ -330,3 +331,13 @@ class EditLogoForm(forms.ModelForm):
         widgets = {
             'logo': forms.FileInput(attrs={'id': 'ed-logo'})
         }
+
+
+class RespostaAvaliacaoForm(forms.ModelForm):
+    class Meta:
+        model = RespostaLojista
+        fields = ['conteudo']
+        widgets = {
+            'conteudo': forms.Textarea()
+        }
+        

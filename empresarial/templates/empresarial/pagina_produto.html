@@ -101,7 +101,28 @@
                         <p class="card-text">{{ avaliacao.conteudo }}</p>
                         <p>Recomenda esse produto: <strong>{% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</strong></p>
                     </div>
+
+                    <!-- Respostas -->
+                    {% if avaliacao.respostas.all %}
+                        <div class="card ms-5">
+                            {% for resposta in avaliacao.respostas.all %}
+                                <p class="ms-3"><strong>{{ resposta.lojista.loja_set.first }}</strong> respondeu:</p>
+                                <p class="ms-3"><small>{{ resposta.datetime }}</small></p>
+                                <p class="ms-3">{{ resposta.conteudo }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                     <!-- Responder avaliação -->
+                     {% if not avaliacao.id|ja_respondeu %}
+                        <div>
+                            <form method="post" action="{% url 'empresarial:responder_avaliacao' avaliacao.id %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                <input class="btn btn-primary mt-3" type="submit" value="Responder">
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         {% else %}

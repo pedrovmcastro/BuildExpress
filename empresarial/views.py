@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views import View
 from django.db import IntegrityError
-from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, ProdutoForm, MinhaLojaForm, NewLogoForm, EditLogoForm
-from .models import Lojista, Plano
+from django.db.models import Prefetch
+from .forms import LojistaForm, EnderecoForm, ResponsavelForm, LojaForm, PlanoForm, SenhaForm, ProdutoForm, MinhaLojaForm, NewLogoForm, EditLogoForm, RespostaAvaliacaoForm
+from .models import Lojista, Plano, RespostaLojista
 from ecommerce.models import Endereco, Loja, Produto, Pedido, ItemCarrinho, Avaliacao
 from entregas.models import Entrega, EntregaAgendada
 from .forms import LojistaLoginForm, LojistaForm
@@ -224,14 +225,20 @@ def concluir_cadastro(request):
 def pagina_produto(request, id_produto):
     produto = get_object_or_404(Produto, id=id_produto)
 
-    # Avaliacoes
-    avaliacoes = Avaliacao.objects.filter(produto=produto)
+    # Avaliações e Respostas
+    avaliacoes = Avaliacao.objects.filter(produto=produto).prefetch_related(
+        Prefetch('respostas', queryset=RespostaLojista.objects.select_related('lojista'))
+    )
+
+    # Responder avaliações
+    form_resposta = RespostaAvaliacaoForm()
 
     if request.user.is_authenticated and produto.loja.lojista == request.user:
         return render(request, 'empresarial/pagina_produto.html', {
             'produto': produto,
             'volume': round(produto.volume_em_metros_cubicos()*1000000, 2),
-            'avaliacoes': avaliacoes
+            'avaliacoes': avaliacoes,
+            'form': form_resposta,
         })
     else:
         raise PermissionDenied
@@ -367,3 +374,19 @@ def saiu_para_entrega(request, id_entrega):
         return redirect("empresarial:index")
     
     raise PermissionDenied
+
+
+@lojista_required
+def responder_avaliacao(request, id_avaliacao):
+    avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
+        
+    if request.method == 'POST':
+        form = RespostaAvaliacaoForm(request.POST)
+
+        if form.is_valid():
+            resposta = form.save(commit=False)
+            resposta.lojista = request.user
+            resposta.avaliacao = avaliacao
+            resposta.save()
+
+    return redirect("empresarial:pagina_produto", id_produto=avaliacao.produto.id)

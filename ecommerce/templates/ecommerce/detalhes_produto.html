@@ -144,6 +144,16 @@
                                 <input type="submit" value="Deletar" class="btn btn-danger">
                             </form>
                         {% endif %}
+                        <!-- Respostas -->
+                        {% if avaliacao.respostas.all %}
+                            <div class="card ms-5">
+                                {% for resposta in avaliacao.respostas.all %}
+                                    <p class="ms-3"><strong>{{ resposta.lojista.loja_set.first }}</strong> respondeu:</p>
+                                    <p class="ms-3"><small>{{ resposta.datetime }}</small></p>
+                                    <p class="ms-3">{{ resposta.conteudo }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
