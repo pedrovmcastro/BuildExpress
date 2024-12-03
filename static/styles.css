@@ -20,6 +20,16 @@ label {
     margin-top: 7rem;
 }
 
+.btn {
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+.btn:hover {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+
 .btn.btn-secondary {
     margin: 10px;
 }
