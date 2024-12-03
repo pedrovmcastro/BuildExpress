@@ -280,3 +280,15 @@ label {
 .star-rating label:hover ~ label {
     color: gold;
 }
+
+.filled-star {
+    color: gold; /* Cor das estrelas preenchidas */
+}
+
+.empty-star {
+    color: lightgray; /* Cor das estrelas vazias */
+}
+
+.star-size {
+    font-size: 2.5em;
+}

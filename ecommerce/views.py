@@ -164,14 +164,39 @@ def detalhes_produto(request, id_produto):
     form_avaliacao = None
     usuario_ja_avaliou = False
 
+    # Avaliacoes
+    avaliacoes = Avaliacao.objects.filter(produto=produto)
+
     # Lógica da Wishlist e Fazer Avaliacoes
     if request.user.is_authenticated and not request.user.is_lojista and not request.user.is_motorista:
         in_wishlist = Wishlist.objects.filter(user=request.user, produto=produto).exists()
         form_avaliacao = forms.FormAvaliacao()
         usuario_ja_avaliou = Avaliacao.objects.filter(produto=produto, user=request.user).exists()
 
-    # Avaliacoes
-    avaliacoes = Avaliacao.objects.filter(produto=produto)
+        if request.method == 'POST' and not usuario_ja_avaliou:
+            form_avaliacao = forms.FormAvaliacao(request.POST)
+
+            # Validar se a nota foi enviada corretamente
+            nota = request.POST.get('nota')
+            if nota not in ['1', '2', '3', '4', '5']:
+                messages.error(request, "Por favor, selecione uma nota válida.")
+            
+            if form_avaliacao.is_valid():
+                avaliacao = form_avaliacao.save(commit=False)
+                avaliacao.nota = int(nota)
+                avaliacao.user = request.user
+                avaliacao.produto = produto
+                avaliacao.save()
+
+                # Atualiza a média das notas e número de avaliações do produto
+                produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
+                produto.avaliacoes += 1
+                produto.save()
+
+                messages.success(request, "Avaliação enviada com sucesso!")
+                return redirect('ecommerce:detalhes_produto', id_produto)
+            else:
+                messages.error(request, "Erro ao salvar sua avaliação. Tente novamente.")
 
     return render(request, 'ecommerce/detalhes_produto.html', {
         'produto': produto,
@@ -208,33 +233,6 @@ def acionar_wishlist(request, id_produto):
 
 # AVALIAÇÃO
 
-
-@usuario_comum_required
-def fazer_avaliacao(request, id_produto):
-    if request.method == "POST":
-        form_avaliacao = forms.FormAvaliacao(request.POST)
-
-        if form_avaliacao.is_valid():
-            produto = get_object_or_404(Produto, id=id_produto)
-            avaliacao = form_avaliacao.save(commit=False)
-            avaliacao.user = request.user
-            avaliacao.produto = produto
-            avaliacao.save()
-
-            # Atualizar nota do produto
-            produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
-            produto.avaliacoes += 1
-            produto.save()
-
-            return redirect('detalhes_produto', id_produto)
-    else:
-        form_avaliacao = forms.FormAvaliacao()
-
-    return render(request, 'ecommerce/detalhes_produto.html', {
-        'form': form_avaliacao
-    })   
-
-
 @usuario_comum_required
 def deletar_avaliacao(request, id_produto, id_avaliacao):
     avaliacao = get_object_or_404(Avaliacao, id=id_avaliacao)
@@ -245,7 +243,7 @@ def deletar_avaliacao(request, id_produto, id_avaliacao):
     produto.nota = Avaliacao.objects.filter(produto=produto).aggregate(Avg('nota'))['nota__avg']
     produto.avaliacoes -= 1
     produto.save()
-    return redirect('detalhes_produto', id_produto)
+    return redirect('ecommerce:detalhes_produto', id_produto)
 
 
 # CARRINHO

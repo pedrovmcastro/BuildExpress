@@ -1,13 +1,34 @@
 {% extends "ecommerce/layout.html" %}
 
+{% load ecommerce_filters %}
+
 {% block body %}
-    
+
     <h2 class="mb-4">{{ produto }}</h2>
 
+    <div class="erro mt-3">
+        {% for message in messages %}
+            {% if 'success' in message.tags %}
+                <p class="alert alert-success">{{ message }}</p>
+            {% elif 'error' in message.tags %}
+                <p class="alert alert-danger">{{ message }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
     <!--Nota do produto-->
+    <span class="star-rating">
+        {% for i in 5|to_range_D:0 %}
+            {% if i <= produto.nota %}
+                <span class="filled-star star-size">★</span>
+            {% else %}
+                <span class="empty-star star-size">★</span>
+            {% endif %}
+        {% endfor %}
+    </span>
     {% if produto.nota %}
-        <div class="mb-3">
-            {{ produto.nota }} ({{ produto.avaliacoes }})
+        <div class="mb-3 fs-4">
+            <strong>{{ produto.nota }} ({{ produto.avaliacoes }}) </strong>
         </div>
     {% else %}
         <div class="mb-3">
@@ -31,13 +52,6 @@
             {% csrf_token %}
             <input type="submit" value="Adicionar ao carrinho" class="btn btn-success"> 
         </form>
-
-        <div class="erro mt-3">
-            {% for message in messages %}
-                <p class="alert alert-danger">{{ message }}</p>
-            {% endfor %}
-        </div>
-
     {% endif %}
     
     <!--Detalhes do Produto -->
@@ -108,12 +122,21 @@
             {% for avaliacao in avaliacoes %}
                 <div class="card mb-3">
                     <div class="card-body">
-                        <p>Nota: {{ avaliacao.nota }}</p>
-                        <h6 class="card-title"><strong>{{ avaliacao.user.username }}</strong></h6>
+                        <span class="fs-3 star-rating">
+                            {% for i in 5|to_range_D:0 %}
+                                {% if i <= avaliacao.nota %}
+                                    <span class="filled-star">★</span>
+                                {% else %}
+                                    <span class="empty-star">★</span>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <p class="fs-5">Nota: {{ avaliacao.nota }}</p>
+                        <h6 class="card-title"><strong>{{ avaliacao.user.nome }}</strong></h6>
                         <p><small>{{ avaliacao.datetime }}</small></p>
                         <h5><strong>{{ avaliacao.titulo }}</strong></h5>
                         <p class="card-text">{{ avaliacao.conteudo }}</p>
-                        <p>Recomenda esse produto: {{ avaliacao.recomenda }}</p>
+                        <p>Recomenda esse produto: {% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</p>
                         <!--Deletar avaliacao-->
                         {% if avaliacao.user == request.user %}
                             <form method="post" action="{% url 'ecommerce:deletar_avaliacao' id_produto=produto.id id_avaliacao=avaliacao.id %}">
@@ -133,10 +156,21 @@
         <!--Adicionar uma avaliacao-->
         {% if user.is_authenticated and not usuario_ja_avaliou and not user.is_lojista and not user.is_motorista %}   
             <div>
-                <form method="post" action="{% url 'ecommerce:fazer_avaliacao' produto.id %}">
+                <form method="post" action="{% url 'ecommerce:detalhes_produto' produto.id %}">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <input class="btn btn-primary" type="submit" value="Avaliar">
+                    <!-- Estrelas -->
+                    <div>
+                        <label class="text-dark" for="nota">Nota:</label>
+                        <div class="star-rating" id="produto_rating">
+                            <input type="radio" name="nota" value="5" id="m5"><label for="m5">★</label>
+                            <input type="radio" name="nota" value="4" id="m4"><label for="m4">★</label>
+                            <input type="radio" name="nota" value="3" id="m3"><label for="m3">★</label>
+                            <input type="radio" name="nota" value="2" id="m2"><label for="m2">★</label>
+                            <input type="radio" name="nota" value="1" id="m1"><label for="m1">★</label>
+                        </div>
+                    </div>
+                    <input class="btn btn-primary mt-4" type="submit" value="Avaliar">
                 </form>
             </div>
         {% endif %}

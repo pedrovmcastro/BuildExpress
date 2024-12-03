@@ -32,7 +32,7 @@ class UsuarioComumLoginForm(BaseLoginForm):
 class FormAvaliacao(forms.ModelForm):
     class Meta:
         model = Avaliacao
-        fields = ['titulo', 'conteudo', 'nota', 'recomenda']
+        fields = ['titulo', 'conteudo', 'recomenda']
         widgets = {
             'conteudo': forms.Textarea(attrs={'placeholder': 'Adicione sua avaliação', 'rows': 3})
         }

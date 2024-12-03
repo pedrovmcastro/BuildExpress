@@ -193,7 +193,9 @@ class Avaliacao(models.Model):
     recomenda = models.BooleanField()
 
     def __str__(self):
-        return f"{self.user} avaliou o produto {self.produto} às {self.datetime_submited}"
+        local_datetime = timezone.localtime(self.datetime)
+        formatted_datetime = local_datetime.strftime("%d/%m/%Y às %H:%M")
+        return f"{self.user} avaliou o produto {self.produto} às {formatted_datetime}"
     
 
 class Carrinho(models.Model):
@@ -282,7 +284,7 @@ class AvaliacaoMotorista(models.Model):
 class AvaliacaoLoja(models.Model):
     user = models.ForeignKey(UsuarioComum, on_delete=models.CASCADE)
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
-    nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    nota = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=None)
     datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
