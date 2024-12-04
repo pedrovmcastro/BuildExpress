@@ -153,6 +153,13 @@ label {
     text-align: center; /* Centraliza o texto dentro do card */
 }
 
+.card-footer {
+    margin-top: auto; /* Garante que o rodapé fique na parte inferior */
+    padding: 10px; /* Espaçamento interno */
+    background-color: #f8f9fa; /* Fundo claro */
+    border-top: 1px solid #ddd; /* Linha de separação */
+}
+
 /* Imagens */
 .card img {
     object-fit: cover;
