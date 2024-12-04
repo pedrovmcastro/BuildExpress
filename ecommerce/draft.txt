@@ -238,3 +238,280 @@ agendada_form = forms.EntregaAgendadaForm(request.POST)
                         )
                     messages.error(request, "Erro na validação da entrega agendada")
                     return redirect('ecommerce:confirmar_pedido')
+
+
+
+
+/* Cartões dos Produtos */
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Leve elevação ao passar o mouse */
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); /* Sombra mais forte */
+}
+
+/* Corpo do cartão */
+.card-body {
+    padding: 20px;
+    text-align: center; /* Centraliza o texto dentro do card */
+}
+
+/* Imagens */
+.card img {
+    object-fit: contain;
+    border-bottom: 2px solid #ec4c2c; /* Destaque visual */
+}
+
+/* Títulos */
+.card-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #333;
+}
+
+/* Preços */
+.card p strong {
+    color: #ec4c2c;
+    font-size: 1.1em;
+}
+
+/* Avaliações com estrelas */
+.star-rating .filled-star {
+    color: #ffd700; /* Dourado para estrelas preenchidas */
+}
+
+.star-rating .empty-star {
+    color: #ccc; /* Cinza para estrelas vazias */
+}
+
+/* Logo e Icones */
+
+#card-logo-loja {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Fundo claro */
+    border: 1px solid #ddd;
+}
+
+#card-logo-loja img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Ícones de ações */
+#card-icones a img {
+    transition: transform 0.3s ease;
+    object-fit: cover;
+}
+
+#card-icones a:hover img {
+    transform: scale(1.1); /* Ampliar ícone levemente no hover */
+}
+
+.link {
+    color: #ec4c2c; /* Texto laranja permanente */
+    text-decoration: none; /* Remove sublinhado */
+    font-weight: bold; /* Destaca o texto */
+    transition: color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Efeitos suaves */
+}
+
+.link:hover {
+    color: #d43a20; /* Escurece o texto no hover */
+    transform: translateY(-2px); /* Elevação no hover */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra no hover */
+    text-decoration: none; /* Garante que o sublinhado não volte */
+}
+
+/* new features css */
+
+
+/* Navegação principal */
+.nav-pills .nav-link {
+    color: #333;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #ec4c2c;
+    color: white;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #ec4c2c;
+    color: white;
+    font-weight: bold;
+}
+
+
+
+
+{% extends "ecommerce/layout.html" %}
+
+{% load ecommerce_filters %}
+
+{% block body %}
+<h2 class="mb-4">Produtos</h2>
+
+<!-- Todos os produtos  -->
+<div class="row">
+    {% for produto in produtos %}
+        <div class="col-6 mb-4">
+            <a href="{% url 'ecommerce:detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+                <div class="card h-100">
+                    <!-- Parte superior do card -->
+                    <div class="row no-gutters flex-grow-1">
+                        <!-- Imagem do produto -->
+                        <div class="col-lg-4 col-md-5">
+                            <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="100%" height="200px">
+                        </div>
+                        <!-- Informações do produto -->
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <span class="star-rating">
+                                    {% for i in 5|to_range_D:0 %}
+                                        {% if i <= produto.nota %}
+                                            <span class="filled-star star-size">★</span>
+                                        {% else %}
+                                            <span class="empty-star star-size">★</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                {% if produto.nota %}
+                                    <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
+                                {% else %}
+                                    <p>Nenhuma avaliação (0)</p>
+                                {% endif %}
+                                <h5 class="card-title"><strong>{{ produto }}</strong></h5>
+                                <p><strong>R$ {{ produto.preco }}</strong></p>
+                                <p>
+                                    {{ produto.descricao|slice:250 }}
+                                    {% if produto.descricao|length > 250 %}...{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rodapé do cartão -->
+                    <div class="card-footer mt-auto">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <!-- Logo da loja -->
+                            <a href="{% url 'ecommerce:produtos_loja' produto.loja.id %}">
+                                {% if produto.loja.logo %}
+                                    <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="60px" height="60px">
+                                {% endif %}
+                            </a>
+                            <!-- Ícone do carrinho -->
+                            <div id="card-icones" class="me-3">
+                                <a href="{% url 'ecommerce:adicionar_ao_carrinho' produto.id %}">
+                                    <img src="media/icones/carrinho.png" alt="Adicionar ao carrinho" width="40px" height="40px">
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Mensagens de erro -->
+                        <div class="erro">
+                            {% for message in messages %}
+                                {% if produto.id|stringformat:"s"|add:" error" == message.tags %}
+                                    <p class="alert alert-danger">{{ message }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock body %}
+
+
+
+{% extends "ecommerce/layout.html" %}
+
+{% load ecommerce_filters %}
+
+{% block body %}
+    <h2 class="mb-4">Produtos</h2>
+
+    <!-- Todos os produtos  -->
+    <div class="row">
+        {% for produto in produtos %}
+            <div class="col-6 mb-4">
+                <a href="{% url 'ecommerce:detalhes_produto' produto.id %}" class="text-decoration-none text-dark">
+                    <div class="card h-100">
+                        <div class="row no-gutters">
+
+                            <div class="col-lg-4 col-md-5">
+                                <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="100%" height="200px"> 
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <span class="star-rating">
+                                        {% for i in 5|to_range_D:0 %}
+                                            {% if i <= produto.nota %}
+                                                <span class="filled-star star-size">★</span>
+                                            {% else %}
+                                                <span class="empty-star star-size">★</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    {% if produto.nota %}
+                                        <p>{{ produto.nota }} ({{ produto.avaliacoes }})</p>
+                                    {% else %}
+                                        <p>Nenhuma avaliação (0)</p>
+                                    {% endif %}
+                                    <h5 class="card-title"><strong>{{ produto }}</strong></h5>
+                                    <p><strong>R$ {{ produto.preco }}</strong></p>
+                                    <p>
+                                        {{ produto.descricao|slice:250 }}
+                                        {% if produto.descricao|length > 250 %}...{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+
+                        <div id="card-logo-loja" class="card mt-2">
+                            <div class="row align-items-center">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <a href="{% url 'ecommerce:produtos_loja' produto.loja.id %}">
+                                        {% if produto.loja.logo %}
+                                            <img src="{{ produto.loja.logo.url }}" alt="{{ produto.loja.nome }}" width="60px" height="60px">
+                                        {% endif %}
+                                    </a>
+                                    <div id="card-icones" class="card-footer me-3"> <!-- 'ms-3' adiciona margem entre logo e texto -->
+                                        <a href="{% url 'ecommerce:adicionar_ao_carrinho' produto.id %}">
+                                            <img src="media/icones/carrinho.png" alt="Adicionar ao carrinho" width="40px" height="40px">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="erro">
+                                    {% for message in messages %}
+                                        {% if produto.id|stringformat:"s"|add:" error" == message.tags %}
+                                            <p class="alert alert-danger">{{ message }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    
+{% endblock body %}

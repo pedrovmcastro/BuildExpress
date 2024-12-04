@@ -1,3 +1,5 @@
+USE nome_do_seu_banco_de_dados;
+
 DELIMITER $$
 
 CREATE TRIGGER atualizar_estoque_apos_entrega
@@ -10,8 +12,8 @@ BEGIN
         JOIN ecommerce_carrinho carrinho ON carrinho.id = ic.carrinho_id
         JOIN ecommerce_pedido pedido ON pedido.carrinho_id = carrinho.id
         SET produto.estoque = produto.estoque - ic.quantidade
-        WHERE pedido.id = NEW.pedido_id
+        WHERE pedido.id = NEW.pedido_id;
     END IF;
 END $$
 
-DELIMITER ;   
+DELIMITER ;

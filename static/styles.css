@@ -153,10 +153,11 @@ label {
     text-align: center; /* Centraliza o texto dentro do card */
 }
 
-/* Imagens */
-.card img {
-    object-fit: cover;
-    border-bottom: 2px solid #ec4c2c; /* Destaque visual */
+.card-footer {
+    margin-top: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
 }
 
 /* Títulos */
@@ -499,115 +500,4 @@ label {
         flex: 1 1 100%; /* 1 item por linha em telas muito pequenas */
         max-width: 100%;
     }
-}
-
-/* Cartões dos Produtos */
-
-.card {
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px); /* Leve elevação ao passar o mouse */
-    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); /* Sombra mais forte */
-}
-
-/* Corpo do cartão */
-.card-body {
-    padding: 20px;
-    text-align: center; /* Centraliza o texto dentro do card */
-}
-
-/* Imagens */
-.card img {
-    object-fit: cover;
-    border-bottom: 2px solid #ec4c2c; /* Destaque visual */
-}
-
-/* Títulos */
-.card-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin: 10px 0;
-    color: #333;
-}
-
-/* Preços */
-.card p strong {
-    color: #ec4c2c;
-    font-size: 1.1em;
-}
-
-/* Avaliações com estrelas */
-.star-rating .filled-star {
-    color: #ffd700; /* Dourado para estrelas preenchidas */
-}
-
-.star-rating .empty-star {
-    color: #ccc; /* Cinza para estrelas vazias */
-}
-
-/* Logo e Icones */
-
-#card-logo-loja {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f9f9f9; /* Fundo claro */
-    border: 1px solid #ddd;
-}
-
-#card-logo-loja img {
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* Ícones de ações */
-#card-icones a img {
-    transition: transform 0.3s ease;
-    object-fit: cover;
-}
-
-#card-icones a:hover img {
-    transform: scale(1.1); /* Ampliar ícone levemente no hover */
-}
-
-.link {
-    color: #ec4c2c; /* Texto laranja permanente */
-    text-decoration: none; /* Remove sublinhado */
-    font-weight: bold; /* Destaca o texto */
-    transition: color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Efeitos suaves */
-}
-
-.link:hover {
-    color: #d43a20; /* Escurece o texto no hover */
-    transform: translateY(-2px); /* Elevação no hover */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra no hover */
-    text-decoration: none; /* Garante que o sublinhado não volte */
-}
-
-/* new features css */
-
-
-/* Navegação principal */
-.nav-pills .nav-link {
-    color: #333;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.nav-pills .nav-link:hover {
-    background-color: #ec4c2c;
-    color: white;
-}
-
-.nav-pills .nav-link.active {
-    background-color: #ec4c2c;
-    color: white;
-    font-weight: bold;
 }
