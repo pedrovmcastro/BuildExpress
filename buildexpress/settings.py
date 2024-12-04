@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'buildexpress.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'buildexpress',
-        'USER': 'builduser',
-        'PASSWORD': 'Tijolo2024@!',
+        'NAME': 'construcao',
+        'USER': 'root',
+        'PASSWORD': 'Senha123!',
         'HOST': 'localhost',
         'PORT': '3306',
     }

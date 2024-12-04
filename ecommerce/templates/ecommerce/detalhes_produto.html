@@ -3,187 +3,85 @@
 {% load ecommerce_filters %}
 
 {% block body %}
+<div class="container">
+    <!-- Título do Produto -->
+    <h2 class="mb-4 text-center text-uppercase">{{ produto }}</h2>
 
-    <h2 class="mb-4">{{ produto }}</h2>
-
+    <!-- Mensagens de Erro ou Sucesso -->
     <div class="erro mt-3">
         {% for message in messages %}
             {% if 'success' in message.tags %}
-                <p class="alert alert-success">{{ message }}</p>
+                <p class="alert alert-success text-center">{{ message }}</p>
             {% elif 'error' in message.tags %}
-                <p class="alert alert-danger">{{ message }}</p>
+                <p class="alert alert-danger text-center">{{ message }}</p>
             {% endif %}
         {% endfor %}
     </div>
 
-    <!--Nota do produto-->
-    <span class="star-rating">
-        {% for i in 5|to_range_D:0 %}
-            {% if i <= produto.nota %}
-                <span class="filled-star star-size">★</span>
-            {% else %}
-                <span class="empty-star star-size">★</span>
-            {% endif %}
-        {% endfor %}
-    </span>
-    {% if produto.nota %}
-        <div class="mb-3 fs-4">
-            <strong>{{ produto.nota }} ({{ produto.avaliacoes }}) </strong>
-        </div>
-    {% else %}
-        <div class="mb-3">
-            Nenhuma avaliacao ({{ avaliacoes|length }})
-        </div>
-    {% endif %}
+    <!-- Nota do Produto -->
+    <div class="text-center mb-4">
+        <span class="star-rating fs-3">
+            {% for i in 5|to_range_D:0 %}
+                {% if i <= produto.nota %}
+                    <span class="filled-star">★</span>
+                {% else %}
+                    <span class="empty-star">★</span>
+                {% endif %}
+            {% endfor %}
+        </span>
+        {% if produto.nota %}
+            <p class="fs-5 mt-2"><strong>{{ produto.nota }} ({{ produto.avaliacoes }})</strong></p>
+        {% else %}
+            <p class="fs-5 mt-2 text-muted">Nenhuma avaliação (0)</p>
+        {% endif %}
+    </div>
 
-    <!--Lógica da Wishlist -->
+    <!-- Wishlist e Botão de Carrinho -->
     {% if user.is_authenticated and not user.is_lojista and not user.is_motorista %}
-
-        <form method="post" action="{% url 'ecommerce:acionar_wishlist' produto.id %}">
-            {% csrf_token %}
-            {% if in_wishlist %}
-                <input type="submit" value="Remover da Lista de Favoritos" class="btn btn-danger">
-            {% else %}
-                <input type="submit" value="Adicionar à Lista de Favoritos" class="btn btn-primary">
-            {% endif %}
-        </form>
-
-        <form method="post" action="{% url 'ecommerce:adicionar_ao_carrinho' id_produto=produto.id %}" class="mt-3">
-            {% csrf_token %}
-            <input type="submit" value="Adicionar ao carrinho" class="btn btn-success"> 
-        </form>
+        <div class="d-flex justify-content-center gap-3 mb-4">
+            <form method="post" action="{% url 'ecommerce:acionar_wishlist' produto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if in_wishlist %}btn-danger{% else %}btn-primary{% endif %}">
+                    {% if in_wishlist %}Remover da Lista de Favoritos{% else %}Adicionar à Lista de Favoritos{% endif %}
+                </button>
+            </form>
+            <form method="post" action="{% url 'ecommerce:adicionar_ao_carrinho' id_produto=produto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Adicionar ao Carrinho</button>
+            </form>
+        </div>
     {% endif %}
-    
-    <!--Detalhes do Produto -->
-    <div>
-        <img src="{{ produto.photo.url }}" alt="{{ produto }}" width="auto" height="400px">
-        <p>{{ produto.descricao }}</p>
-        <h2>R$ {{ produto.preco }}</h2>
-        <p><strong>Quantidade em estoque: {{ produto.estoque }}</strong></p>
+
+    <!-- Imagem e Detalhes do Produto -->
+    <div class="row mb-5">
+        <!-- Imagem do Produto -->
+        <div class="col-md-6 text-center">
+            <img src="{{ produto.photo.url }}" alt="{{ produto }}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: contain;">
+        </div>
+        <!-- Descrição e Preço -->
+        <div class="col-md-6">
+            <h3 class="text-success">R$ {{ produto.preco }}</h3>
+            <p class="fs-5 mt-3">{{ produto.descricao }}</p>
+            <p><strong>Quantidade em Estoque:</strong> {{ produto.estoque }}</p>
+        </div>
     </div>
-    
+
+    <!-- Detalhes do Produto -->
     <div class="mt-4">
         <h3 class="mb-4">Detalhes</h3>
-        <div class="card">
-            <div class="card-title">
-                {{ produto.loja.nome }}
-            </div>
-            <div class="card-body">
+        <div class="card p-3 shadow-sm">
+            <div class="d-flex align-items-center gap-3">
                 {% if produto.loja.logo %}
-                    <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" width="100px" height="100px">
+                    <img src="{{ produto.loja.logo.url }}" alt="{{ loja.nome }}" class="rounded-circle shadow-sm" width="100" height="100">
                 {% endif %}
+                <h5 class="mb-0">{{ produto.loja.nome }}</h5>
             </div>
+            {% if produto.categoria %}
+                <p class="mt-3">Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}" class="link-primary">{{ produto.categoria }}</a></p>
+            {% else %}
+                <p class="mt-3 text-muted">Sem categoria</p>
+            {% endif %}
         </div>
-        {% if produto.categoria %}
-            <p>Categoria: <a href="{% url 'ecommerce:produtos_categoria' produto.categoria.id %}">{{ produto.categoria }}</a></p>
-        {% else %}
-            <p>Sem categoria</p>
-        {% endif %}
     </div>
-
-    <!-- Dimensões -->
-    <div class="mt-5 mb-5 text-center">
-        <table class="table table-bordered">
-            <thead class="header-table">
-                <tr>
-                    <th colspan="2">Dimensões do Produto</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Peso:</strong></td>
-                    <td>{{ produto.peso }} Kg</td>
-                </tr>
-                <tr>
-                    <td><strong>Comprimento:</strong></td>
-                    <td>{{ produto.comprimento }} cm</td>
-                </tr>
-                <tr>
-                    <td><strong>Largura:</strong></td>
-                    <td>{{ produto.largura }} cm</td>
-                </tr>
-                <tr>
-                    <td><strong>Altura:</strong></td>
-                    <td>{{ produto.altura }} cm</td>
-                </tr>
-                <tr>
-                    <td><strong>Volume:</strong></td>
-                    <td>{{ volume }} cm³</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!--Avaliacoes de usuarios-->
-    <div class="mt-4">
-        <!--Lista de avaliacoes-->
-        <h3 class="mb-4">Avaliações</h3>
-        {% if avaliacoes %}
-            {% for avaliacao in avaliacoes %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <span class="fs-3 star-rating">
-                            {% for i in 5|to_range_D:0 %}
-                                {% if i <= avaliacao.nota %}
-                                    <span class="filled-star">★</span>
-                                {% else %}
-                                    <span class="empty-star">★</span>
-                                {% endif %}
-                            {% endfor %}
-                        </span>
-                        <p class="fs-5">Nota: {{ avaliacao.nota }}</p>
-                        <h6 class="card-title"><strong>{{ avaliacao.user.nome }}</strong></h6>
-                        <p><small>{{ avaliacao.datetime }}</small></p>
-                        <h5><strong>{{ avaliacao.titulo }}</strong></h5>
-                        <p class="card-text">{{ avaliacao.conteudo }}</p>
-                        <p>Recomenda esse produto: <strong>{% if avaliacao.recomenda %}Sim{% else %}Não{% endif %}</strong></p>
-                        <!--Deletar avaliacao-->
-                        {% if avaliacao.user == request.user %}
-                            <form method="post" action="{% url 'ecommerce:deletar_avaliacao' id_produto=produto.id id_avaliacao=avaliacao.id %}">
-                                {% csrf_token %}
-                                <input type="submit" value="Deletar" class="btn btn-danger">
-                            </form>
-                        {% endif %}
-                        <!-- Respostas -->
-                        {% if avaliacao.respostas.all %}
-                            <div class="card ms-5">
-                                {% for resposta in avaliacao.respostas.all %}
-                                    <p class="ms-3"><strong>{{ resposta.lojista.loja_set.first }}</strong> respondeu:</p>
-                                    <p class="ms-3"><small>{{ resposta.datetime }}</small></p>
-                                    <p class="ms-3">{{ resposta.conteudo }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="alert alert-secondary" role="alert">
-                <h6>Ainda não há avaliações.</h6>
-            </div>
-        {% endif %}
-
-        <!--Adicionar uma avaliacao-->
-        {% if user.is_authenticated and not usuario_ja_avaliou and not user.is_lojista and not user.is_motorista %}   
-            <div>
-                <form method="post" action="{% url 'ecommerce:detalhes_produto' produto.id %}">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <!-- Estrelas -->
-                    <div>
-                        <label class="text-dark" for="nota">Nota:</label>
-                        <div class="star-rating" id="produto_rating">
-                            <input type="radio" name="nota" value="5" id="m5"><label for="m5">★</label>
-                            <input type="radio" name="nota" value="4" id="m4"><label for="m4">★</label>
-                            <input type="radio" name="nota" value="3" id="m3"><label for="m3">★</label>
-                            <input type="radio" name="nota" value="2" id="m2"><label for="m2">★</label>
-                            <input type="radio" name="nota" value="1" id="m1"><label for="m1">★</label>
-                        </div>
-                    </div>
-                    <input class="btn btn-primary mt-4" type="submit" value="Avaliar">
-                </form>
-            </div>
-        {% endif %}
-    </div>
-
+</div>
 {% endblock body %}
