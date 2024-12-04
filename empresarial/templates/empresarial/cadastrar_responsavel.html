@@ -3,17 +3,23 @@
 {% block title %}Cadastre sua loja{% endblock title %}
 
 {% block body %}
-    <h2>Responsável da loja</h2>
-    <p>Informe os dados da pessoa que tem o nome no contrato social da empresa, seja como dona, sócia ou sócia administrativa</p>
+    <div class="form-container">
+        <h2 class="mb-4 text-center">Responsável da loja</h2>
+        <p class="text-center">
+            Informe os dados da pessoa que tem o nome no contrato social da empresa, 
+            seja como dona, sócia ou sócia administrativa.
+        </p>
 
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
+        {% if message %}
+            <div class="alert alert-danger text-center">{{ message }}</div>
+        {% endif %}
 
-    <form method="post" mt="mt-3">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input class="btn btn-primary" type="submit" value="Continuar">
-    </form>
-
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <input class="btn btn-primary" type="submit" value="Continuar">
+        </form>
+    </div>
 {% endblock body %}
