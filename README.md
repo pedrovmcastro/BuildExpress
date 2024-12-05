@@ -1,6 +1,13 @@
-# Aplicação Django - E-commerce Multiplataforma
+# BuildExpress
+
+## Aplicação Django - E-commerce Multiplataforma
 
 Este é um projeto acadêmico desenvolvido com Django e MySQL, que simula uma plataforma de e-commerce com diferentes tipos de usuários: clientes, lojistas e motoristas. O objetivo principal é implementar funcionalidades completas de autenticação, gerenciamento de lojas e produtos, além de um portal para solicitações de entrega.
+
+## Desenvolvido por
+
+- Pedro Henrique Cezarini
+- Pedro Vitor Marques de Castro
 
 ## Visão Geral
 
@@ -28,10 +35,11 @@ Cada seção possui suas próprias tabelas de banco de dados e lógica de autent
   - Upload de logo.
   - Atualização de informações da loja.
 - Exibição de produtos em uma interface amigável.
+- Gerenciamento dos pedidos.
 
 ### Motoristas (Entregas)
 - Cadastro e login com autenticação personalizada.
-- Recebimento e gerenciamento de solicitações de entrega (futuramente).
+- Recebimento e gerenciamento de solicitações de entrega.
 
 ## Requisitos
 
@@ -47,4 +55,28 @@ Certifique-se de ter os seguintes itens instalados:
    ```bash
    git clone https://github.com/seu-usuario/seu-repositorio.git
    cd seu-repositorio
-   
+
+2. **Crie um ambiente virtual e ative-o:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # No Windows: venv\Scripts\activate
+
+3. **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+
+4. **Configure o banco de dados:**
+- Crie um banco de dados MySQL
+- Atualize o arquivo ```setings.py``` com suas credenciais do banco de dados.
+
+5. **Execute as migrations:**
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+
+6. **Inicie o servidor de desenvolvimento:**
+    ```bash
+    python manage.py runserver
+
+
+Nota: Este projeto é acadêmico e foi desenvolvido como parte de um trabalho da Fatec Campinas. Algumas funcionalidades ainda estão em desenvolvimento.
