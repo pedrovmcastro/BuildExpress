@@ -53,8 +53,8 @@ Certifique-se de ter os seguintes itens instalados:
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   cd seu-repositorio
+   git clone https://github.com/pedrovmcastro/BuildExpress.git
+   cd BuildExpress
 
 2. **Crie um ambiente virtual e ative-o:**
     ```bash
